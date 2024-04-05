@@ -46,6 +46,9 @@ def init_h(arg:str):
     print('  |                                              |')
     print('  |', colored('Format', 'red'), ': \'repman -i\' or \'repman --init\'      |')
     print('  |                                              |')
+    print('  | Note: you can also specify the init path af- |')
+    print('  | ter the -i or --init arg.                    |')
+    print('  |                                              |')
     print('\nEND')
     exit(0)
 
@@ -229,7 +232,8 @@ def main():
                 else:
                     init(value)
             
-            # all others
+            # add
+            if 
                     
 
 if __name__=='__main__':
