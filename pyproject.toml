@@ -16,7 +16,9 @@ classifiers = [
 ]
 dependencies = [
     'optioner>=1.4.5',
-    'termcolor'
+    'termcolor',
+    'gdown',
+    'tk'
 ]
 keywords = ['d33pster', 'repman', 'RepMan', 'Repo Man', 'Repository Manager']
 license = { file="LICENSE" }
