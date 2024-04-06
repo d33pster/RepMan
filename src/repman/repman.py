@@ -12,11 +12,13 @@ def helper():
     print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
     print(colored(f'v{__version__}\n', 'red'))
     print('help\n')
-    print('  |  -h or --help      : show this help text and exit.')
-    print('  |  -v or --version   : show version and exit.')
-    print('  |  -i or --init      : initialize settings, configurations and exit.')
-    print('  |  -a or --add       : add a git repository under RepMan\'s care.')
-    print('  |  -o or --open      : open a project/repository.\n')
+    print('  |  -h or --help          : show this help text and exit.')
+    print('  |  -v or --version       : show version and exit.')
+    print('  |  -i or --init          : initialize settings, configurations and exit.')
+    print('  |  -a or --add           : add a git repository under RepMan\'s care.')
+    print('  |  -o or --open          : open a project/repository.')
+    print('  |  -l or --list          : list all the projects under RepMan\'s care. and exit.')
+    print('  |  -lp or --list-w-path  : list all the projects under RepMan\'s care with their paths and exit.\n')
     print(colored('NOTE', 'blue'), ': For further help, run', colored('\'repman <argument> -h\'', 'red'), 'or', colored('\'repman <argument> --help\'.', 'red'))
     print('\nEND')
     exit(0)
@@ -106,18 +108,28 @@ def init(path: str = None):
     repmanctrl.version = __version__
     repmanctrl.initialize()
 
+# function to add a repo to the projects directory
+def add(val: str):
+    global repmanctrl
+    repmanctrl = repman()
+    
+    repmanctrl.version = __version__
+    repmanctrl.add(val)
+
 # main function
 def main():
     # create arguments
-    shortargs = ['h', 'v', 'a', 'i', 'o']
-    longargs = ['help', 'version', 'add', 'init', 'open']
+    shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp']
+    longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path']
     
     # mutually exclusive args
     mutex = [
-        ['v', 'version'],['a', 'add', 'i', 'init', 'o', 'open'],
-        ['a', 'add'],['o','open', 'i', 'init', 'v', 'version'],
-        ['o','open'],['a', 'add', 'i', 'init', 'v', 'version'],
-        ['i', 'init'],['o','open', 'v', 'version', 'a', 'add']
+        ['v', 'version'],['a', 'add', 'i', 'init', 'o', 'open', 'l', 'list', 'lp', 'list-w-path'],
+        ['a', 'add'],['o','open', 'i', 'init', 'v', 'version', 'l', 'list', 'lp', 'list-w-path'],
+        ['o','open'],['a', 'add', 'i', 'init', 'v', 'version', 'l', 'list', 'lp', 'list-w-path'],
+        ['i', 'init'],['o','open', 'v', 'version', 'a', 'add', 'l', 'list', 'lp', 'list-w-path'],
+        ['l', 'list'], ['a', 'add', 'i', 'init', 'o', 'open', 'lp', 'list-w-path', 'v', 'version'],
+        ['lp', 'list-w-path'], ['a', 'add', 'i', 'init', 'o', 'open', 'l', 'list', 'v', 'version']
     ]
     
     optctrl = options(shortargs, longargs, argv[1:], ifthisthennotthat=mutex)
@@ -233,8 +245,36 @@ def main():
                     init(value)
             
             # add
-            if 
-                    
+            if '-a' in args:
+                index = args.index('-a')
+                
+                try:
+                    value = args[index+1]
+                except IndexError:
+                    value = None
+                
+                if value==None:
+                    print(colored('RepMan', 'red'), ': \'-a\' needs a value.')
+                    exit(1)
+                else:
+                    add(value)
+            elif '--add' in args:
+                index = args.index('--add')
+                
+                try:
+                    value = args[index+1]
+                except IndexError:
+                    value = None
+                
+                if value==None:
+                    print(colored('RepMan', 'red'), ': \'--add\' needs a value.')
+                    exit(1)
+                else:
+                    add(value)
+            
+            # list
+            
+            # open
 
 if __name__=='__main__':
     repmanctrl: repman

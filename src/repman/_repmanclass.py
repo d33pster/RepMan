@@ -3,20 +3,95 @@
 #
 
 from termcolor import colored
-from os import getcwd as pwd, popen as getoutputof, system as run, chdir, listdir
-from os.path import expanduser, join
+from os import getcwd as pwd, popen as getoutputof, system as run, chdir, listdir, environ, makedirs
+from os.path import expanduser, join, basename, exists as there
+from pathlib import Path
 from tkinter import filedialog
-from re import search
+from re import search, match
+import pandas as pd
+from tabulate import tabulate
 import subprocess
 import platform
 
 class repman:
     def __init__(self, projectpath:str = None):
+        # version
         self.version = ''
-        self.path = projectpath
+        # fetch project path if defined.
+        if projectpath==None:
+            self.path = environ['REPMAN_PROJECT_PATH']
+        else:
+            self.path = projectpath
+        # working path -> where it is called.
         self.workingpath = pwd()
+        # dot folder
+        self.dotfolder = join(self.path, '.repman')
+        if not there(self.dotfolder):
+            makedirs(self.dotfolder)
+        # projectlist
+        self.projects: list[dict] = []
+        # -> get project list.
+        try: 
+            with open(join(self.dotfolder, '.projects'), 'r') as proj:
+                content = proj.readlines()
+            for c in content:
+                c = c.replace('\n','')
+                data = {
+                    'project':c.split(':')[0],
+                    'path':c.split(':')[1]
+                }
+                self.projects.append(data)
+        except FileNotFoundError:
+            pass
+
+    def open(self, name:str):
+        print(' ')
+        
+    def lister(self):
+        lister = pd.DataFrame(self.projects)
+        lister = lister['project']
+        print(colored(' Following repos are currently under RepMan\'s care:', 'blue'))
+        print(tabulate(lister, headers='keys', tablefmt='rounded_grid', missingval='?'))
+        
     
-    def 
+    def add(self, url:str):
+        # set project path
+        self.path = environ['REPMAN_PROJECT_PATH']
+        chdir(self.path)
+        # check format -> must be github link or <username>/<repo>
+        if match(r'^https://github.com/\w+/\w+$', url):
+            if match(r'^https://github.com/\w+/\w+.git$', url):
+                # remove extension and save
+                urlbasename = Path(url).stem
+            else:
+                urlbasename = basename(url)
+
+            # -> try cloning
+            # output = getoutputof(f'git clone {url}').readlines()
+            with open(join(self.dotfolder, '.log'), 'w') as logfile:
+                subprocess.Popen(['git', 'clone', f'{url}'], stderr=logfile, stdout=logfile).wait()
+        elif match(r'^\w+/\w+$', url):
+            urlbasename = url.split('/')[1]
+            # -> try cloning
+            with open(join(self.dotfolder, '.log'), 'w') as logfile:
+               subprocess.Popen(['git', 'clone', f'https://github.com/{url}.git'], stderr=logfile, stdout=logfile).wait()
+        
+        # -> check log for output
+        with open(join(self.dotfolder, '.log'), 'r') as log:
+            logfile = log.readlines()
+        # -> check output
+        index = len(logfile)-1
+        # -> if error
+        if match(r'^fatal:\s+\w+$', logfile[index]):
+            print('RepMan:', colored(f'Cannot add \'{urlbasename}\'. Check for Spelling Errors.', 'red'))
+            exit(1)
+        
+        # if no error
+        # -> save project data to .projects
+        with open(join(self.dotfolder, '.projects'), 'a') as projfile:
+            projfile.write(f"{urlbasename}:{join(self.path, urlbasename)}")
+        # -> print added
+        print('RepMan', colored(f'Added {urlbasename} -> {join(self.path, urlbasename)}', 'green'))
     
     def initialize(self):
         # Requisites:
@@ -105,6 +180,7 @@ class repman:
             print('RepMan:', colored(f'Project Folder set to {self.path}', 'green'))
             print('RepMan:', colored('Jumpstart END', 'green'))
             print('RepMan:', colored('Terminal restart requested!', 'red'))
+            chdir(self.workingpath)
             exit(0)
         except KeyboardInterrupt:
             exit(1)
