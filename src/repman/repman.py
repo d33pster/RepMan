@@ -22,7 +22,9 @@ def helper():
     print('  |  -a or --add           : add a git repository under RepMan\'s care.')
     print('  |  -o or --open          : open a project/repository.')
     print('  |  -l or --list          : list all the projects under RepMan\'s care. and exit.')
-    print('  |  -lp or --list-w-path  : list all the projects under RepMan\'s care with their paths and exit.\n')
+    print('  |  -lp or --list-w-path  : list all the projects under RepMan\'s care with their paths and exit.')
+    print('  |  -ae or --add-existing : Add an already cloned repository under RepMan\'s care.')
+    print('  |  -u or --update         : update a repository.',colored('[requires internet]\n', 'red'))
     print(colored('NOTE', 'blue'), ': For further help, run', colored('\'repman <argument> -h\'', 'red'), 'or', colored('\'repman <argument> --help\'.', 'red'))
     print('\nEND')
     exit(0)
@@ -135,6 +137,22 @@ def addexisting_h(arg: str):
     print('\nEND')
     exit(0)
 
+# function to print specialized help on '-u' or '--update'
+def update_h(arg:str):
+    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
+    print(colored(f'v{__version__}\n', 'red'))
+    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
+    print('  | This argument is used to update a project    |')
+    print('  | with github remote repository.               |')
+    print('  |                                              |')
+    print('  | Each file\'s commit msg will be asked.        |')
+    print('  |                                              |')
+    print('  |', colored('Format', 'red'), ': \'repman -u <project-name>\'          |')
+    print('  |                                              |')
+    print(colored('\nNote', 'red'), ': Requires Internet Connectivity.')
+    print('\nEND')
+    exit(0)
+
 # function to display version and exit
 def version():
     print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
@@ -189,6 +207,15 @@ def openthis(projects:list[str]):
     
     repmanctrl.open(projects)
 
+# function to update a repo
+def update(projectname:str):
+    global repmanctrl
+    repmanctrl = repman()
+    repmanctrl.version = __version__
+    repmanctrl.setvariables()
+    
+    repmanctrl.update(projectname)
+
 # list value removing function
 def rem(original:list[str], remove:list[str]) -> list[str]:
     removed:list[str] = []
@@ -201,8 +228,8 @@ def rem(original:list[str], remove:list[str]) -> list[str]:
 # main function
 def main():
     # create arguments
-    shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp', 'ae']
-    longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path', 'add-existing']
+    shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp', 'ae', 'al', 'u']
+    longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path', 'add-existing', 'add-local', 'update']
     
     # All args
     original = shortargs.copy()
@@ -216,7 +243,9 @@ def main():
         ['i', 'init'],rem(original, ['i', 'init', 'h', 'help']),
         ['l', 'list'],rem(original, ['l', 'list', 'h', 'help']),
         ['lp', 'list-w-path'],rem(original, ['lp', 'list-w-path', 'h', 'help']),
-        ['ae', 'add-existing'],rem(original, ['ae', 'add-existing', 'h', 'help'])
+        ['ae', 'add-existing'],rem(original, ['ae', 'add-existing', 'h', 'help']),
+        ['al', 'add-local'], rem(original, ['al', 'add-local', 'h', 'help']),
+        ['u', 'update'], rem(original, ['u', 'update', 'h', 'help'])
     ]
     
     optctrl = options(shortargs, longargs, argv[1:], ifthisthennotthat=mutex)
@@ -263,6 +292,11 @@ def main():
                         listwpath_h(otherarg)
                     elif otherarg == '-ae' or otherarg == '--add-existing':
                         addexisting_h(otherarg)
+                    elif otherarg == '-al' or otherarg == '--add-local':
+                        # addlocal_h(otherarg)
+                        pass
+                    elif otherarg == '-u' or otherarg == '--update':
+                        update_h(otherarg)
                     else:
                         print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                 elif len(args)<2:
@@ -303,6 +337,11 @@ def main():
                         listwpath_h(otherarg)
                     elif otherarg == '-ae' or otherarg == '--add-existing':
                         addexisting_h(otherarg)
+                    elif otherarg == '-al' or otherarg == '--add-local':
+                        # addlocal_h(otherarg)
+                        pass
+                    elif otherarg == '-u' or otherarg == '--update':
+                        update_h(otherarg)
                     else:
                         print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                 elif len(args)<2:
@@ -433,6 +472,24 @@ def main():
                     exit(1)
                 
                 openthis(value)
+            
+            # update
+            if '-u' in args:
+                index = argv.index('-u')
+                try:
+                    value = argv[index+1]
+                    update(value)
+                except IndexError:
+                    print(colored('RepMan', 'red'), ': \'-u\' needs a value.')
+                    exit(1)
+            elif '--update' in args:
+                index = argv.index('--update')
+                try:
+                    value = argv[index+1]
+                    update(value)
+                except IndexError:
+                    print(colored('RepMan', 'red'), ': \'--update\' needs a value.')
+                    exit(1)
 
 if __name__=='__main__':
     repmanctrl: repman
