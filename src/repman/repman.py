@@ -268,9 +268,9 @@ def main():
             
             # init
             if '-i' in args:
-                index = args.index('-i')
+                index = argv.index('-i')
                 try:
-                    value = args[index+1]
+                    value = argv[index+1]
                 except IndexError:
                     value = None
                 
@@ -279,9 +279,9 @@ def main():
                 else:
                     init(value)
             elif '--init' in args:
-                index = args.index('--init')
+                index = argv.index('--init')
                 try:
-                    value = args[index+1]
+                    value = argv[index+1]
                 except IndexError:
                     value = None
                 
@@ -292,10 +292,9 @@ def main():
             
             # add
             if '-a' in args:
-                index = args.index('-a')
-                
+                index = argv.index('-a')
                 try:
-                    value = args[index+1]
+                    value = argv[index+1]
                 except IndexError:
                     value = None
                 
@@ -305,10 +304,10 @@ def main():
                 else:
                     add(value)
             elif '--add' in args:
-                index = args.index('--add')
+                index = argv.index('--add')
                 
                 try:
-                    value = args[index+1]
+                    value = argv[index+1]
                 except IndexError:
                     value = None
                 
