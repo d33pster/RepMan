@@ -6,233 +6,11 @@
 
 __version__ = '1.0.1'
 
-from repman._repmanclass import repman
+from repman._repmanfunctions import funcdefs
+from repman._repmanhelps import helptext
 from optioner import options
 from sys import argv
 from termcolor import colored
-
-# function to print general help
-def helper():
-    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
-    print(colored(f'v{__version__}\n', 'red'))
-    print('help\n')
-    print('  |  -h or --help          : show this help text and exit.')
-    print('  |  -v or --version       : show version and exit.')
-    print('  |  -i or --init          : initialize settings, configurations and exit.')
-    print('  |  -a or --add           : add a git repository under RepMan\'s care.')
-    print('  |  -o or --open          : open a project/repository.')
-    print('  |  -l or --list          : list all the projects under RepMan\'s care. and exit.')
-    print('  |  -lp or --list-w-path  : list all the projects under RepMan\'s care with their paths and exit.')
-    print('  |  -ae or --add-existing : Add an already cloned repository under RepMan\'s care.')
-    print('  |  -al or --add-local    : Add a local git repository under RepMan\'s care.')
-    print('  |  -u or --update        : update a repository.',colored('[requires internet]\n', 'red'))
-    print(colored('NOTE', 'blue'), ': For further help, run', colored('\'repman <argument> -h\'', 'red'), 'or', colored('\'repman <argument> --help\'.', 'red'))
-    print('\nEND')
-    exit(0)
-
-# function to print specialized help on '-v' or '--version'
-def version_h(arg:str):
-    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
-    print(colored(f'v{__version__}\n', 'red'))
-    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
-    print('  | This Argument shows the version information  |')
-    print('  | of RepMan.                                   |')
-    print('\nEND')
-    exit(0)
-
-# function to print specialized help on '-i' or '--init'
-def init_h(arg:str):
-    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
-    print(colored(f'v{__version__}\n', 'red'))
-    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
-    print('  | This argument is used to initialize RepMan.  |')
-    print('  |                                              |')
-    print('  | It will automatically detect and try to Ini- |')
-    print('  | tialize RepMan and all its Configurations.   |')
-    print('  |                                              |')
-    print('  | This Argument may ask input from the user a- |')
-    print('  | bout few Configurations.                     |')
-    print('  |                                              |')
-    print('  |', colored('Format', 'red'), ': \'repman -i\' or \'repman --init\'      |')
-    print('  |                                              |')
-    print('  | Note: you can also specify the init path af- |')
-    print('  | ter the -i or --init arg.                    |')
-    print('  |                                              |')
-    print('\nEND')
-    exit(0)
-
-# function to print specialized help on '-a' or '--add'
-def add_h(arg:str):
-    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
-    print(colored(f'v{__version__}\n', 'red'))
-    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
-    print('  | This argument is used to add git repositori- |')
-    print('  | es under RepMan\'s care. This basically means |')
-    print('  | RepMan will manage that repository for you.  |')
-    print('  |                                              |')
-    print('  |', colored('Format', 'red'), ': \'repman -a <link>\'                  |')
-    print('  |                 or                           |')
-    print('  |          \'repman -a <username>/<repo>\'       |')
-    print('  |                                              |')
-    print('\nEND')
-    exit(0)
-
-# function to print specialized help on '-o' or '--open'
-def open_h(arg:str):
-    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
-    print(colored(f'v{__version__}\n', 'red'))
-    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
-    print('  | This argument is used to open projects and   |')
-    print('  | work on them as you please.                  |')
-    print('  |                                              |')
-    print('  | RepMan will automatically add .gitignore fi- |')
-    print('  | le if it is not present in the opened proje- |')
-    print('  | ct.                                          |')
-    print('  |                                              |')
-    print('  | Since this is a python project itself, RepMan|')
-    print('  | will add the necessary files in the .gitign- |')
-    print('  | ore file. such as \'dist\' if the destination  |')
-    print('  | is found to be a python project.             |')
-    print('  |                                              |')
-    print('  |',colored('Format', 'red'), ': \'repman -o <project-name>\'          |')
-    print('  |                                              |')
-    print('\nEND')
-    exit(0)
-
-# function to print specialized help on '-l' or '--list'
-def list_h(arg:str):
-    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
-    print(colored(f'v{__version__}\n', 'red'))
-    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
-    print('  | This argument is used to list all the proje- |')
-    print('  | cts under RepMan\'s care.                     |')
-    print('  |                                              |')
-    print('  |', colored('Format', 'red'), ': \'repman -l\' or \'repman --list\'      |')
-    print('  |                                              |')
-    print('\nEND')
-    exit(0)
-
-# function to print specialized help on '-lp' or '--list-w-path'
-def listwpath_h(arg:str):
-    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
-    print(colored(f'v{__version__}\n', 'red'))
-    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
-    print('  | This argument is used to list all the proje- |')
-    print('  | cts  and their paths under RepMan\'s care.    |')
-    print('  |                                              |')
-    print('  |', colored(' Format', 'red'), ': \'repman -lp\'                       |')
-    print('  |                                              |')
-    print('\nEND')
-    exit(0)
-
-# function to print specialized help on '-ae' or '--add-existing'
-def addexisting_h(arg: str):
-    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
-    print(colored(f'v{__version__}\n', 'red'))
-    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
-    print('  | This argument is used to add pre-cloned dir- |')
-    print('  | ectory under RepMan\'s care.                  |')
-    print('  |                                              |')
-    print('  |', colored('Format', 'red'), ': \'repman -ae <path>\'                 |')
-    print('  |                                              |')
-    print('\nEND')
-    exit(0)
-
-# function to print specialized help on '-al' or '--add-local'
-def addlocal_h(arg:str):
-    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
-    print(colored(f'v{__version__}\n', 'red'))
-    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
-    print('  | This argument is for adding local git repos- |')
-    print('  | itory under RepMan\'s care.                   |')
-    print('  |                                              |')
-    print('  | You might be prompted to set the default     |')
-    print('  | branch and remote repository link(if not yet |')
-    print('  | created, then create one.)                   |')
-    print('  |                                              |')
-    print('  |', colored('Format', 'red'), ': \'repman -al <path>\'                 |')
-    print('  |                                              |')
-    print('\nEND')
-    exit(0)
-
-# function to print specialized help on '-u' or '--update'
-def update_h(arg:str):
-    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
-    print(colored(f'v{__version__}\n', 'red'))
-    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
-    print('  | This argument is used to update a project    |')
-    print('  | with github remote repository.               |')
-    print('  |                                              |')
-    print('  | Each file\'s commit msg will be asked.        |')
-    print('  |                                              |')
-    print('  |', colored('Format', 'red'), ': \'repman -u <project-name>\'          |')
-    print('  |                                              |')
-    print(colored('\nNote', 'red'), ': Requires Internet Connectivity.')
-    print('\nEND')
-    exit(0)
-
-# function to display version and exit
-def version():
-    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
-    print('         version', colored(f'v{__version__}', 'red'))
-    print('         author:', colored('d33pster', 'light_blue'))
-    print('         GitHub:', colored('https://github.com/d33pster', 'light_blue'))
-    exit(0)
-
-# function to initialize repman
-def init(path: str = None):
-    global repmanctrl
-    repmanctrl = repman(path)
-    
-    repmanctrl.version = __version__
-    repmanctrl.initialize()
-
-# function to add a repo to the projects directory
-def add(val: str):
-    global repmanctrl
-    repmanctrl = repman()
-    repmanctrl.setvariables()
-    repmanctrl.version = __version__
-    repmanctrl.add(val)
-
-# function to list
-def lister(path: bool):
-    global repmanctrl
-    repmanctrl = repman()
-    repmanctrl.setvariables()
-    repmanctrl.version = __version__
-    
-    if path:
-        repmanctrl.lister(path=True)
-    else:
-        repmanctrl.lister()
-
-# function to add existing path
-def addexisting(paths: list[str]):
-    global repmanctrl
-    repmanctrl = repman()
-    repmanctrl.version = __version__
-    repmanctrl.setvariables()
-    
-    repmanctrl.add_existing(paths)
-
-# function to open a project
-def openthis(projects:list[str]):
-    global repmanctrl
-    repmanctrl = repman()
-    repmanctrl.version = __version__
-    repmanctrl.setvariables()
-    
-    repmanctrl.open(projects)
-
-# function to update a repo
-def update(projectname:str):
-    global repmanctrl
-    repmanctrl = repman()
-    repmanctrl.version = __version__
-    repmanctrl.setvariables()
-    
-    repmanctrl.update(projectname)
 
 # list value removing function
 def rem(original:list[str], remove:list[str]) -> list[str]:
@@ -245,6 +23,10 @@ def rem(original:list[str], remove:list[str]) -> list[str]:
 
 # main function
 def main():
+    # helptext
+    help = helptext(__version__)
+    # functions
+    funk = funcdefs(__version__)
     # create arguments
     shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp', 'ae', 'al', 'u']
     longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path', 'add-existing', 'add-local', 'update']
@@ -295,29 +77,29 @@ def main():
                         otherarg = args[0]
                     
                     if otherarg=='-h' or otherarg=='--help':
-                        helper()
+                        help.base()
                     elif otherarg=='-v' or otherarg=='--version':
-                        version_h(otherarg)
+                        help.version_h(otherarg)
                     elif otherarg=='-i' or otherarg=='--init':
-                        init_h(otherarg)
+                        help.init_h(otherarg)
                     elif otherarg=='-a' or otherarg=='--add':
-                        add_h(otherarg)
+                        help.add_h(otherarg)
                     elif otherarg=='-o' or otherarg=='--open':
-                        open_h(otherarg)
+                        help.open_h(otherarg)
                     elif otherarg == '-l' or otherarg == '--list':
-                        list_h(otherarg)
+                        help.list_h(otherarg)
                     elif otherarg == '-lp' or otherarg == '--list-w-path':
-                        listwpath_h(otherarg)
+                        help.listwpath_h(otherarg)
                     elif otherarg == '-ae' or otherarg == '--add-existing':
-                        addexisting_h(otherarg)
+                        help.addexisting_h(otherarg)
                     elif otherarg == '-al' or otherarg == '--add-local':
-                        addlocal_h(otherarg)
+                        help.addlocal_h(otherarg)
                     elif otherarg == '-u' or otherarg == '--update':
-                        update_h(otherarg)
+                        help.update_h(otherarg)
                     else:
                         print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                 elif len(args)<2:
-                    helper()
+                    help.base()
                 elif len(args)>2:
                     print(colored('RepMan Err', 'red'), ': Please use one argument at a time to show help on that argument.')
                     print(colored('Format', 'blue'), ': \'repman <argument> -h\' or \'repman <argument> --help\'.')
@@ -339,29 +121,29 @@ def main():
                         otherarg = args[0]
                     
                     if otherarg=='-h' or otherarg=='--help':
-                        helper()
+                        help.base()
                     elif otherarg=='-v' or otherarg=='--version':
-                        version_h(otherarg)
+                        help.version_h(otherarg)
                     elif otherarg=='-i' or otherarg=='--init':
-                        init_h(otherarg)
+                        help.init_h(otherarg)
                     elif otherarg=='-a' or otherarg=='--add':
-                        add_h(otherarg)
+                        help.add_h(otherarg)
                     elif otherarg=='-o' or otherarg=='--open':
-                        open_h(otherarg)
+                        help.open_h(otherarg)
                     elif otherarg == '-l' or otherarg == '--list':
-                        list_h(otherarg)
+                        help.list_h(otherarg)
                     elif otherarg == '-lp' or otherarg == '--list-w-path':
-                        listwpath_h(otherarg)
+                        help.listwpath_h(otherarg)
                     elif otherarg == '-ae' or otherarg == '--add-existing':
-                        addexisting_h(otherarg)
+                        help.addexisting_h(otherarg)
                     elif otherarg == '-al' or otherarg == '--add-local':
-                        addlocal_h(otherarg)
+                        help.addlocal_h(otherarg)
                     elif otherarg == '-u' or otherarg == '--update':
-                        update_h(otherarg)
+                        help.update_h(otherarg)
                     else:
                         print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                 elif len(args)<2:
-                    helper()
+                    help.base()
                 elif len(args)>2:
                     print(colored('RepMan Err', 'red'), ': Please use one argument at a time to show help on that argument.')
                     print(colored('Format', 'blue'), ': \'repman <argument> -h\' or \'repman <argument> --help\'.')
@@ -375,7 +157,7 @@ def main():
             
             # version
             if '-v' in args or '--version' in args:
-                version()
+                help.version()
             
             # init
             if '-i' in args:
@@ -386,9 +168,9 @@ def main():
                     value = None
                 
                 if value==None:
-                    init()
+                    funk.init()
                 else:
-                    init(value)
+                    funk.init(value)
             elif '--init' in args:
                 index = argv.index('--init')
                 try:
@@ -397,9 +179,9 @@ def main():
                     value = None
                 
                 if value==None:
-                    init()
+                    funk.init()
                 else:
-                    init(value)
+                    funk.init(value)
             
             # add
             if '-a' in args:
@@ -413,7 +195,7 @@ def main():
                     print(colored('RepMan', 'red'), ': \'-a\' needs a value.')
                     exit(1)
                 else:
-                    add(value)
+                    funk.add(value)
             elif '--add' in args:
                 index = argv.index('--add')
                 
@@ -426,7 +208,7 @@ def main():
                     print(colored('RepMan', 'red'), ': \'--add\' needs a value.')
                     exit(1)
                 else:
-                    add(value)
+                    funk.add(value)
             
             # add existing
             if '-ae' in args:
@@ -440,7 +222,7 @@ def main():
                     print(colored('RepMan', 'red'), ': \'-ae\' needs atleast one value.')
                     exit(1)
                 
-                addexisting(value)
+                funk.addexisting(value)
                 
             elif '--add-existing' in args:
                 index = argv.index('--add-existing')
@@ -453,15 +235,15 @@ def main():
                     print(colored('RepMan', 'red'), ': \'--add-existing\' needs atleast one value.')
                     exit(1)
                 
-                addexisting(value)
+                funk.addexisting(value)
             
             # list
             if '-l' in args or '--list' in args:
-                lister(False)
+                funk.lister(False)
             
             # list with path
             if '-lp' in args or '--list-w-path' in args:
-                lister(True)
+                funk.lister(True)
             
             # open
             if '-o' in args:
@@ -475,7 +257,7 @@ def main():
                     print(colored('RepMan', 'red'), ': \'-o\' needs atleast one value.')
                     exit(1)
                 
-                openthis(value)
+                funk.openthis(value)
             elif '--open' in args:
                 index = argv.index('--open')
                 
@@ -487,14 +269,14 @@ def main():
                     print(colored('RepMan', 'red'), ': \'--open\' needs atleast one value.')
                     exit(1)
                 
-                openthis(value)
+                funk.openthis(value)
             
             # update
             if '-u' in args:
                 index = argv.index('-u')
                 try:
                     value = argv[index+1]
-                    update(value)
+                    funk.update(value)
                 except IndexError:
                     print(colored('RepMan', 'red'), ': \'-u\' needs a value.')
                     exit(1)
@@ -502,11 +284,39 @@ def main():
                 index = argv.index('--update')
                 try:
                     value = argv[index+1]
-                    update(value)
+                    funk.update(value)
                 except IndexError:
                     print(colored('RepMan', 'red'), ': \'--update\' needs a value.')
                     exit(1)
+            
+            # add local
+            if '-al' in args:
+                index = argv.index('-al')
+                value:list[str] = []
+                try:
+                    for i in range(index+1, len(argv)):
+                        value.append(argv[i])
+                except IndexError:
+                    print(colored('RepMan', 'red'), ': \'-al\' needs atleast one value.')
+                    exit(1)
+                
+                funk.addlocal(value)
+            elif '--add-local' in args:
+                index = argv.index('--add-local')
+                value:list[str] = []
+                try:
+                    for i in range(index+1, len(argv)):
+                        value.append(argv[i])
+                except IndexError:
+                    print(colored('RepMan', 'red'), ': \'--add-local\' needs atleast one value.')
+                    exit(1)
+                
+                funk.addlocal(value)
+                
 
 if __name__=='__main__':
-    repmanctrl: repman
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print('\nRepMan: Keyboard Interrupt')
+        exit(1)
