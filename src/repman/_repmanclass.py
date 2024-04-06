@@ -92,7 +92,7 @@ class repman:
         with open(join(self.dotfolder, '.projects'), 'a') as projfile:
             projfile.write(f"{urlbasename}:{join(self.path, urlbasename)}")
         # -> print added
-        print('RepMan', colored(f'Added {urlbasename} -> {join(self.path, urlbasename)}', 'green'))
+        print('RepMan:', colored(f'Added {urlbasename} -> {join(self.path, urlbasename)}', 'green'))
     
     def initialize(self):
         # Requisites:
