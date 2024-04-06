@@ -58,7 +58,7 @@ class repman:
         except FileNotFoundError:
             pass
     
-    ####################### ADD LOCAL FUNCTION ######################### NEEDS FIXING
+    ####################### ADD LOCAL FUNCTION ######################### NEEDS FIXING ##################
     def addlocal(self, paths:list[str]):
         # ask for default branch if not set
         if there(join(self.dotfolder, '.branch')):
