@@ -4,14 +4,17 @@
 
 from termcolor import colored
 from os import getcwd as pwd, popen as getoutputof, system as run, chdir, listdir, environ, makedirs
-from os.path import expanduser, join, basename, exists as there
+from os.path import expanduser, join, basename, exists as there, dirname, abspath
 from pathlib import Path
 from tkinter import filedialog
 from re import search, match
 import pandas as pd
 from tabulate import tabulate
+from shutil import copytree
 import subprocess
 import platform
+
+####################### CLASS REPMAN ############################
 
 class repman:
     def __init__(self, projectpath:str = None):
@@ -19,17 +22,26 @@ class repman:
         self.version = ''
         # fetch project path if defined.
         if projectpath==None:
-            self.path = environ['REPMAN_PROJECT_PATH']
+            self.path = ''
         else:
             self.path = projectpath
         # working path -> where it is called.
         self.workingpath = pwd()
+        # get current os
+        self.operatingsystem = platform.system()
+        # projectlist
+        self.projects: list[dict] = []
+    
+    ################### SET PATH FROM OUTSIDE ###############################
+    def setvariables(self):
+        try:
+            self.path = environ['REPMAN_PROJECT_PATH']
+        except KeyError:
+            raise RuntimeError('bad call of setvariables function before running init.')
         # dot folder
         self.dotfolder = join(self.path, '.repman')
         if not there(self.dotfolder):
             makedirs(self.dotfolder)
-        # projectlist
-        self.projects: list[dict] = []
         # -> get project list.
         try: 
             with open(join(self.dotfolder, '.projects'), 'r') as proj:
@@ -43,19 +55,42 @@ class repman:
                 self.projects.append(data)
         except FileNotFoundError:
             pass
-        # get current os
-        self.operatingsystem = platform.system()
 
+    ############## OPEN FUNCTION INSIDE REPMAN CLASS #############################
     def open(self, name:str):
         print(' ')
-        
-    def lister(self, path:bool=False):
-        lister = pd.DataFrame(self.projects)
-        if not path:
-            lister = pd.DataFrame(lister['project'].to_list(), columns=['project'])
-        print(colored('Following repos are currently under RepMan\'s care:', 'light_blue'))
-        print(tabulate(lister, headers='keys', tablefmt='rounded_grid', missingval='?', showindex=False))
     
+    ############## LISTER FUNCTION INSIDE REPMAN CLASS #############################
+    def lister(self, path:bool=False):
+        if len(self.projects)>0:
+            lister = pd.DataFrame(self.projects)
+            if not path:
+                lister = pd.DataFrame(lister['project'].to_list(), columns=['project'])
+            print(colored('Following repos are currently under RepMan\'s care:', 'light_blue'))
+            print(tabulate(lister, headers='keys', tablefmt='rounded_grid', missingval='?', showindex=False))
+        else:
+            print(colored('RepMan', 'red'),': No project found under RepMan\'s care.')
+
+    ############## ADD-EXISTING FUNCTION INSIDE REPMAN CLASS #############################
+    def add_existing(self, paths:list[str]):
+        for path in paths:
+            path = abspath(path)
+            # if already inside the project directory
+            if dirname(path) == self.path:
+                # add entry in the .projects file
+                with open(join(self.dotfolder, '.projects'), 'a') as projfile:
+                    projfile.write(basename(path)+':'+path+'\n')
+                print('RepMan:', colored(f'Added {basename(path)} -> {path}', 'green'))
+            else:
+                ## copy
+                try:
+                    newpath = copytree(path, join(self.path, basename(path)))
+                except FileNotFoundError:
+                    print(colored('RepMan', 'red'), f': No such file in this directory. <- {path}')
+                    exit(1)
+                print('RepMan:', colored(f'Added {basename(path)} -> {newpath}', 'green'))
+    
+    ############## ADD FUNCTION INSIDE REPMAN CLASS #############################
     def add(self, url:str):
         # set project path
         self.path = environ['REPMAN_PROJECT_PATH']
@@ -95,6 +130,7 @@ class repman:
         # -> print added
         print('RepMan:', colored(f'Added {urlbasename} -> {join(self.path, urlbasename)}', 'green'))
     
+    ############## INITIALIZE FUNCTION INSIDE REPMAN CLASS #############################
     def initialize(self):
         # Requisites:
         #   1. installation of code
@@ -122,7 +158,7 @@ class repman:
                 if not checkcodeinstall:
                     installvscode()
                 else:
-                    print('RepMan:', colored(f"vscode found -> {getoutputof('code -v').readline().replace('\n','')}", 'green'))
+                    print('RepMan:', colored(f"vscode found -> v{getoutputof('code -v').readline().replace('\n','')}", 'green'))
             ## CODE INSTALLATION END ##
 
             ## installation of git ##
@@ -163,6 +199,8 @@ class repman:
                 print(colored(' Choose a Project folder...', 'blue'), end='\r')
                 # -> get filepath
                 self.path = filedialog.askdirectory(initialdir=self.workingpath, title='select project path')
+            else:
+                pass
                 
             # -> resolve where to save the project path
             if platform.system()=='Linux' or platform.system()=='Darwin':
@@ -173,7 +211,7 @@ class repman:
                 filenames = listdir()
                 # count shells
                 for filename in filenames:
-                    if search('^.\w+rc$', filename):
+                    if search('^.\w+shrc$', filename):
                         shells.append(filename)
                 # update every shell
                 for shell in shells:
@@ -203,6 +241,7 @@ class repman:
         except KeyboardInterrupt:
             exit(1)
 
+## installgit funtion outside repman class ##
 def installgit():
     print('RepMan:', colored('git not found.', 'red'))
     print('RepMan:', colored('Installing git.', 'yellow'), end='\r')
@@ -224,6 +263,7 @@ def installgit():
         
         print('RepMan:', colored(f'git installed -> {gitversion}', 'green'))
 
+## installvscode funtion outside repman class ##
 def installvscode():
     print('RepMan:', colored('vscode not found.', 'red'))
     

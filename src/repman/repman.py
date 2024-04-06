@@ -4,7 +4,7 @@
 # Linux -> aarch64
 # MacOs -> AppleSilicon(arm64)
 
-__version__ = '1.0'
+__version__ = '1.0.1'
 
 from repman._repmanclass import repman
 from optioner import options
@@ -122,6 +122,19 @@ def listwpath_h(arg:str):
     print('\nEND')
     exit(0)
 
+# function to print specialized help on '-ae' or '--add-existing'
+def addexisting_h(arg: str):
+    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
+    print(colored(f'v{__version__}\n', 'red'))
+    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
+    print('  | This argument is used to add pre-cloned dir- |')
+    print('  | ectory under RepMan\'s care.                  |')
+    print('  |                                              |')
+    print('  |', colored('Format', 'red'), ': \'repman -ae <path>\'                 |')
+    print('  |                                              |')
+    print('\nEND')
+    exit(0)
+
 # function to display version and exit
 def version():
     print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
@@ -142,7 +155,7 @@ def init(path: str = None):
 def add(val: str):
     global repmanctrl
     repmanctrl = repman()
-    
+    repmanctrl.setvariables()
     repmanctrl.version = __version__
     repmanctrl.add(val)
 
@@ -150,7 +163,7 @@ def add(val: str):
 def lister(path: bool):
     global repmanctrl
     repmanctrl = repman()
-    
+    repmanctrl.setvariables()
     repmanctrl.version = __version__
     
     if path:
@@ -158,20 +171,43 @@ def lister(path: bool):
     else:
         repmanctrl.lister()
 
+# function to add existing path
+def addexisting(paths: list[str]):
+    global repmanctrl
+    repmanctrl = repman()
+    repmanctrl.version = __version__
+    repmanctrl.setvariables()
+    
+    repmanctrl.add_existing(paths)
+
+# list value removing function
+def rem(original:list[str], remove:list[str]) -> list[str]:
+    removed:list[str] = []
+    for x in original:
+        if x not in remove:
+            removed.append(x)
+    
+    return removed
+
 # main function
 def main():
     # create arguments
-    shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp']
-    longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path']
+    shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp', 'ae']
+    longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path', 'add-existing']
+    
+    # All args
+    original = shortargs.copy()
+    original.extend(longargs)
     
     # mutually exclusive args
     mutex = [
-        ['v', 'version'],['a', 'add', 'i', 'init', 'o', 'open', 'l', 'list', 'lp', 'list-w-path'],
-        ['a', 'add'],['o','open', 'i', 'init', 'v', 'version', 'l', 'list', 'lp', 'list-w-path'],
-        ['o','open'],['a', 'add', 'i', 'init', 'v', 'version', 'l', 'list', 'lp', 'list-w-path'],
-        ['i', 'init'],['o','open', 'v', 'version', 'a', 'add', 'l', 'list', 'lp', 'list-w-path'],
-        ['l', 'list'], ['a', 'add', 'i', 'init', 'o', 'open', 'lp', 'list-w-path', 'v', 'version'],
-        ['lp', 'list-w-path'], ['a', 'add', 'i', 'init', 'o', 'open', 'l', 'list', 'v', 'version']
+        ['v', 'version'],rem(original, ['v', 'version', 'h', 'help']),
+        ['a', 'add'],rem(original, ['a', 'add', 'h', 'help']),
+        ['o','open'],rem(original, ['o','open', 'h', 'help']),
+        ['i', 'init'],rem(original, ['i', 'init', 'h', 'help']),
+        ['l', 'list'],rem(original, ['l', 'list', 'h', 'help']),
+        ['lp', 'list-w-path'],rem(original, ['lp', 'list-w-path', 'h', 'help']),
+        ['ae', 'add-existing'],rem(original, ['ae', 'add-existing', 'h', 'help'])
     ]
     
     optctrl = options(shortargs, longargs, argv[1:], ifthisthennotthat=mutex)
@@ -183,6 +219,9 @@ def main():
         exit(1)
     else:
         if len(args)==0:
+            if len(falseargs)>0:
+                print(colored('RepMan Err', 'red'), ': you got the wrong guy bruh.')
+                exit(1)
             print(colored('RepMan Err', 'red'), ': Please tell me what to do.')
             exit(1)
         else:
@@ -213,6 +252,8 @@ def main():
                         list_h(otherarg)
                     elif otherarg == '-lp' or otherarg == '--list-w-path':
                         listwpath_h(otherarg)
+                    elif otherarg == '-ae' or otherarg == '--add-existing':
+                        addexisting_h(otherarg)
                     else:
                         print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                 elif len(args)<2:
@@ -251,6 +292,8 @@ def main():
                         list_h(otherarg)
                     elif otherarg == '-lp' or otherarg == '--list-w-path':
                         listwpath_h(otherarg)
+                    elif otherarg == '-ae' or otherarg == '--add-existing':
+                        addexisting_h(otherarg)
                     else:
                         print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                 elif len(args)<2:
@@ -320,6 +363,33 @@ def main():
                     exit(1)
                 else:
                     add(value)
+            
+            # add existing
+            if '-ae' in args:
+                index = argv.index('-ae')
+                
+                value:list[str] = []
+                try:
+                    for i in range(index+1, len(argv)):
+                        value.append(argv[i])
+                except IndexError:
+                    print(colored('RepMan', 'red'), ': \'-ae\' needs a value.')
+                    exit(1)
+                
+                addexisting(value)
+                
+            elif '--add-existing' in args:
+                index = argv.index('--add-existing')
+                
+                value:list[str] = []
+                try:
+                    for i in range(index+1, len(argv)):
+                        value.append(argv[i])
+                except IndexError:
+                    print(colored('RepMan', 'red'), ': \'--add-existing\' needs a value.')
+                    exit(1)
+                
+                addexisting(value)
             
             # list
             if '-l' in args or '--list' in args:
