@@ -58,6 +58,42 @@ class repman:
         except FileNotFoundError:
             pass
     
+    ####################### ADD LOCAL FUNCTION ######################### NEEDS FIXING
+    def addlocal(self, paths:list[str]):
+        # ask for default branch if not set
+        if there(join(self.dotfolder, '.branch')):
+            with open(join(self.dotfolder, '.branch'), 'r') as bfile:
+                content = bfile.readlines()
+            
+            for c in content:
+                c = c.replace('\n','')
+                if c.split(':')[0] == 'default':
+                    branch = c.split(':')[1]
+        else:
+            branch = input('RepMan -> Enter '+colored('default branch', 'blue')+colored('(one-time)'+'dark_grey') + ': ')
+            with open(join(self.dotfolder, '.branch'), 'w') as bfile:
+                bfile.write('default:'+branch+"\n")
+        
+        # copy the files
+        for path in paths:
+            path = abspath(path)
+            # -> check if already inside the directory
+            if dirname(path) == self.path:
+                # add entry in the .projects file
+                with open(join(self.dotfolder, '.projects'), 'a') as projfile:
+                    projfile.write(basename(path)+':'+path+'\n')
+                print('RepMan:', colored(f'Added {basename(path)} -> {path}', 'green'))
+            else:
+                ## copy
+                try:
+                    newpath = copytree(path, join(self.path, basename(path)))
+                except FileNotFoundError:
+                    print(colored('RepMan', 'red'), f': No such file in this directory. <- {path}')
+                    exit(1)
+                print('RepMan:', colored(f'Added {basename(path)} -> {newpath}', 'green'))
+        
+        # 
+    
     ###################### UPDATE FUNCTION #######################################
     def update(self, projectname:str):
         try:
@@ -86,7 +122,7 @@ class repman:
                 
                 for file in files2:
                     file = file.replace('\n','')
-                    commitmsg = input('RepMan -> Enter commit msg for ' + colored(f'{join(basename(path), file)}', 'blue') + '(new): ')
+                    commitmsg = input('RepMan -> Enter commit msg for ' + colored(f'{join(basename(path), file)}', 'blue') + colored('(new)', 'dark_grey') + ': ')
                     msgs.append(commitmsg)
                 
                 files.extend(files2)
@@ -98,6 +134,7 @@ class repman:
                 
                 print('RepMan:', colored('Pushing', 'yellow'), end='\r')
                 subprocess.Popen(['git', 'push'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                print('                                                      ', end='\r')
                 print('RepMan:', colored('Pushed', 'green'))
         except ConnectionError:
             print(colored('RepMan','red'), ': Please connect to the internet to use this feature.')
