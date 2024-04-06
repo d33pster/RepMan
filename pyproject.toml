@@ -20,7 +20,8 @@ dependencies = [
     'gdown',
     'tk',
     'pandas',
-    'tabulate'
+    'tabulate',
+    'requests'
 ]
 keywords = ['d33pster', 'repman', 'RepMan', 'Repo Man', 'Repository Manager']
 license = { file="LICENSE" }
