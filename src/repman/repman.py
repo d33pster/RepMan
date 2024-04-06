@@ -24,7 +24,8 @@ def helper():
     print('  |  -l or --list          : list all the projects under RepMan\'s care. and exit.')
     print('  |  -lp or --list-w-path  : list all the projects under RepMan\'s care with their paths and exit.')
     print('  |  -ae or --add-existing : Add an already cloned repository under RepMan\'s care.')
-    print('  |  -u or --update         : update a repository.',colored('[requires internet]\n', 'red'))
+    print('  |  -al or --add-local    : Add a local git repository under RepMan\'s care.')
+    print('  |  -u or --update        : update a repository.',colored('[requires internet]\n', 'red'))
     print(colored('NOTE', 'blue'), ': For further help, run', colored('\'repman <argument> -h\'', 'red'), 'or', colored('\'repman <argument> --help\'.', 'red'))
     print('\nEND')
     exit(0)
@@ -119,7 +120,7 @@ def listwpath_h(arg:str):
     print('  | This argument is used to list all the proje- |')
     print('  | cts  and their paths under RepMan\'s care.    |')
     print('  |                                              |')
-    print('  |', colored(' Format', 'red'), ': \'repman -lp\'                        |')
+    print('  |', colored(' Format', 'red'), ': \'repman -lp\'                       |')
     print('  |                                              |')
     print('\nEND')
     exit(0)
@@ -133,6 +134,23 @@ def addexisting_h(arg: str):
     print('  | ectory under RepMan\'s care.                  |')
     print('  |                                              |')
     print('  |', colored('Format', 'red'), ': \'repman -ae <path>\'                 |')
+    print('  |                                              |')
+    print('\nEND')
+    exit(0)
+
+# function to print specialized help on '-al' or '--add-local'
+def addlocal_h(arg:str):
+    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
+    print(colored(f'v{__version__}\n', 'red'))
+    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
+    print('  | This argument is for adding local git repos- |')
+    print('  | itory under RepMan\'s care.                   |')
+    print('  |                                              |')
+    print('  | You might be prompted to set the default     |')
+    print('  | branch and remote repository link(if not yet |')
+    print('  | created, then create one.)                   |')
+    print('  |                                              |')
+    print('  |', colored('Format', 'red'), ': \'repman -al <path>\'                 |')
     print('  |                                              |')
     print('\nEND')
     exit(0)
@@ -293,8 +311,7 @@ def main():
                     elif otherarg == '-ae' or otherarg == '--add-existing':
                         addexisting_h(otherarg)
                     elif otherarg == '-al' or otherarg == '--add-local':
-                        # addlocal_h(otherarg)
-                        pass
+                        addlocal_h(otherarg)
                     elif otherarg == '-u' or otherarg == '--update':
                         update_h(otherarg)
                     else:
@@ -338,8 +355,7 @@ def main():
                     elif otherarg == '-ae' or otherarg == '--add-existing':
                         addexisting_h(otherarg)
                     elif otherarg == '-al' or otherarg == '--add-local':
-                        # addlocal_h(otherarg)
-                        pass
+                        addlocal_h(otherarg)
                     elif otherarg == '-u' or otherarg == '--update':
                         update_h(otherarg)
                     else:
