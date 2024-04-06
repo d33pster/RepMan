@@ -50,10 +50,9 @@ class repman:
     def lister(self, path:bool=False):
         lister = pd.DataFrame(self.projects)
         if not path:
-            lister = lister['project']
-        print(colored(' Following repos are currently under RepMan\'s care:', 'blue'))
-        print(tabulate(lister, headers='keys', tablefmt='rounded_grid', missingval='?'))
-        
+            lister = pd.DataFrame(lister['project'].to_list(), columns=['project'])
+        print(colored('Following repos are currently under RepMan\'s care:', 'light_blue'))
+        print(tabulate(lister, headers='keys', tablefmt='rounded_grid', missingval='?', showindex=False))
     
     def add(self, url:str):
         # set project path
