@@ -18,7 +18,9 @@ dependencies = [
     'optioner>=1.4.5',
     'termcolor',
     'gdown',
-    'tk'
+    'tk',
+    'pandas',
+    'tabulate'
 ]
 keywords = ['d33pster', 'repman', 'RepMan', 'Repo Man', 'Repository Manager']
 license = { file="LICENSE" }
