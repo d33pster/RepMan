@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+## OS Support
+# Linux -> aarch64
+# MacOs -> AppleSilicon(arm64)
+
 __version__ = '1.0'
 
 from repman._repmanclass import repman

@@ -43,6 +43,8 @@ class repman:
                 self.projects.append(data)
         except FileNotFoundError:
             pass
+        # get current os
+        self.operatingsystem = platform.system()
 
     def open(self, name:str):
         print(' ')
@@ -89,7 +91,7 @@ class repman:
         # if no error
         # -> save project data to .projects
         with open(join(self.dotfolder, '.projects'), 'a') as projfile:
-            projfile.write(f"{urlbasename}:{join(self.path, urlbasename)}")
+            projfile.write(f"{urlbasename}:{join(self.path, urlbasename)}\n")
         # -> print added
         print('RepMan:', colored(f'Added {urlbasename} -> {join(self.path, urlbasename)}', 'green'))
     
@@ -106,33 +108,49 @@ class repman:
             ## INSTALLATION OF CODE ##
             # -> check existing installation
             checkcodeinstall = True
-            try:
-                line = getoutputof('code -v').readline().replace('\n', '').replace('v','').split('.')[0] # should be version
-                
+            if self.operatingsystem=='Linux' or self.operatingsystem=='Darwin':
                 try:
-                    line = int(line)
-                except ValueError:
+                    line = getoutputof('code -v').readline().replace('\n', '').replace('v','').split('.')[0] # should be version
+                    
+                    try:
+                        line = int(line)
+                    except ValueError:
+                        checkcodeinstall = False
+                except IndexError:
                     checkcodeinstall = False
-            except IndexError:
-                checkcodeinstall = False
-            
-            if not checkcodeinstall:
-                installvscode()
-            else:
-                print('RepMan:', colored(f"vscode found -> {getoutputof('code -v').readline().replace('\n','')}", 'green'))
+                
+                if not checkcodeinstall:
+                    installvscode()
+                else:
+                    print('RepMan:', colored(f"vscode found -> {getoutputof('code -v').readline().replace('\n','')}", 'green'))
             ## CODE INSTALLATION END ##
-            
+
             ## installation of git ##
             checkgitinstall = True
-            try:
-                line = getoutputof('git -v').readline().replace('\n','').split(' ')[2].split('.')[0]
-
+            if self.operatingsystem == 'Linux':
+                # for linux
                 try:
-                    line = int(line)
-                except ValueError:
+                    line = getoutputof('git -v').readline().replace('\n','').split(' ')[2].split('.')[0]
+
+                    try:
+                        line = int(line)
+                    except ValueError:
+                        checkgitinstall = False
+                except IndexError:
                     checkgitinstall = False
-            except IndexError:
-                checkgitinstall = False
+            elif self.operatingsystem == 'Darwin':
+                # for macos
+                gitversion = None
+                line = getoutputof('git -v').readline().replace('\n','').split(' ')
+                
+                length = len(line)
+                for i in range(length):
+                    if len(line[i].split('.'))==3:
+                        gitversion = line[i]
+                        break
+                
+                if gitversion==None:
+                    checkgitinstall = False
             
             if not checkgitinstall:
                 installgit()
@@ -189,19 +207,38 @@ def installgit():
     print('RepMan:', colored('git not found.', 'red'))
     print('RepMan:', colored('Installing git.', 'yellow'), end='\r')
     
-    if platform.system()=='Linux':
-        subprocess.Popen(['sudo', 'apt-get', 'install', 'git'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+    os = platform.system()
     
-    print('RepMan:', colored(f"git installed -> v{getoutputof('git -v').readline().replace('\n','').split(' ')[2]}", 'green'))
+    if os == 'Linux':
+        subprocess.Popen(['sudo', 'apt-get', 'install', 'git'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+        print('RepMan:', colored(f"git installed -> v{getoutputof('git -v').readline().replace('\n','').split(' ')[2]}", 'green'))
+    elif os == 'Darwin':
+        subprocess.Popen(['brew', 'install', 'git'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+        line = getoutputof('git -v').readline().replace('\n','').split(' ')
+                
+        length = len(line)
+        for i in range(length):
+            if len(line[i].split('.'))==3:
+                gitversion = line[i]
+                break
+        
+        print('RepMan:', colored(f'git installed -> {gitversion}', 'green'))
 
 def installvscode():
     print('RepMan:', colored('vscode not found.', 'red'))
-    print('RepMan:', colored('Downloading vscode.', 'yellow'), end='\r')
     
-    if platform.system()=='Linux':
+    os = platform.system()
+    
+    if os == 'Linux':
         if getoutputof('arch').read().replace('\n','')=='aarch64':
+            print('RepMan:', colored('Downloading vscode.', 'yellow'), end='\r')
             subprocess.Popen(['gdown', 'https://drive.google.com/uc?id=1-PlorBHwmve5-rYx4LGgEsVdcVcsxigE'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
             print('RepMan:', colored('Downloaded vscode', 'green'))
             print('RepMan:', colored('Installing vscode', 'yellow'), end='\r')
             subprocess.Popen(['sudo', 'dpkg', '-i', './code-arm64.deb'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+            print('RepMan:', colored(f"vscode installed -> v{getoutputof('code -v').readline().replace('\n','')}", 'green'))
+    elif os == 'Darwin':
+        if getoutputof('arch').read().replace('\n','')=='arm64':
+            print('RepMan:', colored('Using Brew to install vscode.', 'yellow'), end='\r')
+            subprocess.Popen(['brew', 'install', '--cask', 'visual-studio-code'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
             print('RepMan:', colored(f"vscode installed -> v{getoutputof('code -v').readline().replace('\n','')}", 'green'))
