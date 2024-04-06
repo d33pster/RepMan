@@ -57,8 +57,20 @@ class repman:
             pass
 
     ############## OPEN FUNCTION INSIDE REPMAN CLASS #############################
-    def open(self, name:str):
-        print(' ')
+    def open(self, projects:list[str]):
+        with open(join(self.dotfolder, '.projects'), 'r') as t:
+            projfile = t.readlines()
+        for project in projects:
+            for proj in projfile:
+                proj = proj.replace('\n','')
+                if project == proj.split(':')[0]:
+                    # check the project for templates and stuff -> add later
+                    # open the project.
+                    chdir(proj.split(':')[1])
+                    subprocess.Popen(['code', '.'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                    # print it out
+                    print('RepMan:', colored(f'Opened {project}', 'green'), 'from', colored(f"{proj.split(':')[1]}", 'blue'))
+                    chdir(self.workingpath)
     
     ############## LISTER FUNCTION INSIDE REPMAN CLASS #############################
     def lister(self, path:bool=False):

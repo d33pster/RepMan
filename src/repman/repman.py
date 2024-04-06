@@ -180,6 +180,15 @@ def addexisting(paths: list[str]):
     
     repmanctrl.add_existing(paths)
 
+# function to open a project
+def openthis(projects:list[str]):
+    global repmanctrl
+    repmanctrl = repman()
+    repmanctrl.version = __version__
+    repmanctrl.setvariables()
+    
+    repmanctrl.open(projects)
+
 # list value removing function
 def rem(original:list[str], remove:list[str]) -> list[str]:
     removed:list[str] = []
@@ -373,7 +382,7 @@ def main():
                     for i in range(index+1, len(argv)):
                         value.append(argv[i])
                 except IndexError:
-                    print(colored('RepMan', 'red'), ': \'-ae\' needs a value.')
+                    print(colored('RepMan', 'red'), ': \'-ae\' needs atleast one value.')
                     exit(1)
                 
                 addexisting(value)
@@ -386,7 +395,7 @@ def main():
                     for i in range(index+1, len(argv)):
                         value.append(argv[i])
                 except IndexError:
-                    print(colored('RepMan', 'red'), ': \'--add-existing\' needs a value.')
+                    print(colored('RepMan', 'red'), ': \'--add-existing\' needs atleast one value.')
                     exit(1)
                 
                 addexisting(value)
@@ -400,6 +409,30 @@ def main():
                 lister(True)
             
             # open
+            if '-o' in args:
+                index = argv.index('-o')
+                
+                value:list[str] = []
+                try:
+                    for i in range(index+1, len(argv)):
+                        value.append(argv[i])
+                except IndexError:
+                    print(colored('RepMan', 'red'), ': \'-o\' needs atleast one value.')
+                    exit(1)
+                
+                openthis(value)
+            elif '--open' in args:
+                index = argv.index('--open')
+                
+                value:list[str] = []
+                try:
+                    for i in range(index+1, len(argv)):
+                        value.append(argv[i])
+                except IndexError:
+                    print(colored('RepMan', 'red'), ': \'--open\' needs atleast one value.')
+                    exit(1)
+                
+                openthis(value)
 
 if __name__=='__main__':
     repmanctrl: repman
