@@ -13,6 +13,8 @@ from tabulate import tabulate
 from shutil import copytree
 import subprocess
 import platform
+import requests
+from requests import ConnectionError
 
 ####################### CLASS REPMAN ############################
 
@@ -55,6 +57,43 @@ class repman:
                 self.projects.append(data)
         except FileNotFoundError:
             pass
+    
+    ###################### UPDATE FUNCTION #######################################
+    def update(self, projectname:str):
+        try:
+            code = requests.get('https://google.com/').status_code
+            if code == 200:
+                # get data from saved file
+                with open(join(self.dotfolder, '.projects'), 'r') as p:
+                    content = p.readlines()
+                
+                # get filepath of the project
+                for c in content:
+                    c = c.replace('\n','')
+                    if c.split(':')[0] == projectname:
+                       path = c.split(':')[1]
+                
+                # change to the path
+                chdir(path)
+                # get files that are changed.
+                files = getoutputof('git diff --name-only').readlines()
+                msgs = []
+                for file in files:
+                    file = file.replace('\n','')
+                    commitmsg = input('Enter commit msg for ' + colored(f'{join(basename(path), file)}', 'blue') + ': ')
+                    msgs.append(commitmsg)
+                
+                for i in range(len(files)):
+                    subprocess.Popen(['git', 'add', f"{files[i].replace('\n','')}"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                    subprocess.Popen(['git', 'commit', '-m', f'{msgs[i]}'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                    print('RepMan:', colored(f"Added {join(basename(path), files[i].replace('\n',''))}", 'green'))
+                
+                print('RepMan:', colored('Pushing', 'yellow'), end='\r')
+                subprocess.Popen(['git', 'push'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                print('RepMan:', colored(''))
+        except ConnectionError:
+            print(colored('RepMan','red'), ': Please connect to the internet to use this feature.')
+            exit(1)
 
     ############## OPEN FUNCTION INSIDE REPMAN CLASS #############################
     def open(self, projects:list[str]):
