@@ -80,7 +80,7 @@ class repman:
                 msgs = []
                 for file in files:
                     file = file.replace('\n','')
-                    commitmsg = input('Enter commit msg for ' + colored(f'{join(basename(path), file)}', 'blue') + ': ')
+                    commitmsg = input('RepMan -> Enter commit msg for ' + colored(f'{join(basename(path), file)}', 'blue') + ': ')
                     msgs.append(commitmsg)
                 
                 for i in range(len(files)):
@@ -90,7 +90,7 @@ class repman:
                 
                 print('RepMan:', colored('Pushing', 'yellow'), end='\r')
                 subprocess.Popen(['git', 'push'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
-                print('RepMan:', colored(''))
+                print('RepMan:', colored('Pushed', 'green'))
         except ConnectionError:
             print(colored('RepMan','red'), ': Please connect to the internet to use this feature.')
             exit(1)
