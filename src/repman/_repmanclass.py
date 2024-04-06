@@ -47,9 +47,10 @@ class repman:
     def open(self, name:str):
         print(' ')
         
-    def lister(self):
+    def lister(self, path:bool=False):
         lister = pd.DataFrame(self.projects)
-        lister = lister['project']
+        if not path:
+            lister = lister['project']
         print(colored(' Following repos are currently under RepMan\'s care:', 'blue'))
         print(tabulate(lister, headers='keys', tablefmt='rounded_grid', missingval='?'))
         

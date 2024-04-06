@@ -92,6 +92,32 @@ def open_h(arg:str):
     print('\nEND')
     exit(0)
 
+# function to print specialized help on '-l' or '--list'
+def list_h(arg:str):
+    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
+    print(colored(f'v{__version__}\n', 'red'))
+    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
+    print('  | This argument is used to list all the proje- |')
+    print('  | cts under RepMan\'s care.                     |')
+    print('  |                                              |')
+    print('  |', colored('Format', 'red'), ': \'repman -l\' or \'repman --list\'      |')
+    print('  |                                              |')
+    print('\nEND')
+    exit(0)
+
+# function to print specialized help on '-lp' or '--list-w-path'
+def listwpath_h(arg:str):
+    print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
+    print(colored(f'v{__version__}\n', 'red'))
+    print('help', colored('EXTENDED', 'blue'), f': help for \'{arg}\'\n')
+    print('  | This argument is used to list all the proje- |')
+    print('  | cts  and their paths under RepMan\'s care.    |')
+    print('  |                                              |')
+    print('  |', colored(' Format', 'red'), ': \'repman -lp\'                        |')
+    print('  |                                              |')
+    print('\nEND')
+    exit(0)
+
 # function to display version and exit
 def version():
     print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
@@ -115,6 +141,18 @@ def add(val: str):
     
     repmanctrl.version = __version__
     repmanctrl.add(val)
+
+# function to list
+def lister(path: bool):
+    global repmanctrl
+    repmanctrl = repman()
+    
+    repmanctrl.version = __version__
+    
+    if path:
+        repmanctrl.lister(path=True)
+    else:
+        repmanctrl.lister()
 
 # main function
 def main():
@@ -167,6 +205,10 @@ def main():
                         add_h(otherarg)
                     elif otherarg=='-o' or otherarg=='--open':
                         open_h(otherarg)
+                    elif otherarg == '-l' or otherarg == '--list':
+                        list_h(otherarg)
+                    elif otherarg == '-lp' or otherarg == '--list-w-path':
+                        listwpath_h(otherarg)
                     else:
                         print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                 elif len(args)<2:
@@ -201,6 +243,10 @@ def main():
                         add_h(otherarg)
                     elif otherarg=='-o' or otherarg=='--open':
                         open_h(otherarg)
+                    elif otherarg == '-l' or otherarg == '--list':
+                        list_h(otherarg)
+                    elif otherarg == '-lp' or otherarg == '--list-w-path':
+                        listwpath_h(otherarg)
                     else:
                         print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                 elif len(args)<2:
@@ -273,6 +319,12 @@ def main():
                     add(value)
             
             # list
+            if '-l' in args or '--list' in args:
+                lister(False)
+            
+            # list with path
+            if '-lp' in args or '--list-w-path' in args:
+                lister(True)
             
             # open
 
