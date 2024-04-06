@@ -77,11 +77,19 @@ class repman:
                 chdir(path)
                 # get files that are changed.
                 files = getoutputof('git diff --name-only').readlines()
+                files2 = getoutputof('git ls-files --others --exclude-standard').readlines()
                 msgs = []
                 for file in files:
                     file = file.replace('\n','')
                     commitmsg = input('RepMan -> Enter commit msg for ' + colored(f'{join(basename(path), file)}', 'blue') + ': ')
                     msgs.append(commitmsg)
+                
+                for file in files2:
+                    file = file.replace('\n','')
+                    commitmsg = input('RepMan -> Enter commit msg for ' + colored(f'{join(basename(path), file)}', 'blue') + '(new): ')
+                    msgs.append(commitmsg)
+                
+                files.extend(files2)
                 
                 for i in range(len(files)):
                     subprocess.Popen(['git', 'add', f"{files[i].replace('\n','')}"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
