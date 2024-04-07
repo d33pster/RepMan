@@ -83,6 +83,7 @@ class repman:
                 with open(join(self.dotfolder, '.projects'), 'a') as projfile:
                     projfile.write(basename(path)+':'+path+'\n')
                 print('RepMan:', colored(f'Added {basename(path)} -> {path}', 'green'))
+                # change to the path and change git branch
             else:
                 ## copy
                 try:
@@ -91,8 +92,6 @@ class repman:
                     print(colored('RepMan', 'red'), f': No such file in this directory. <- {path}')
                     exit(1)
                 print('RepMan:', colored(f'Added {basename(path)} -> {newpath}', 'green'))
-        
-        # 
     
     ###################### UPDATE FUNCTION #######################################
     def update(self, projectname:str):
@@ -110,7 +109,11 @@ class repman:
                        path = c.split(':')[1]
                 
                 # change to the path
-                chdir(path)
+                try:
+                    chdir(path)
+                except UnboundLocalError:
+                    print(colored('RepMan', 'red'), f": no project named {projectname}.")
+                    exit(1)
                 # get files that are changed.
                 files = getoutputof('git diff --name-only').readlines()
                 files2 = getoutputof('git ls-files --others --exclude-standard').readlines()
@@ -378,3 +381,4 @@ def installvscode():
             print('RepMan:', colored('Using Brew to install vscode.', 'yellow'), end='\r')
             subprocess.Popen(['brew', 'install', '--cask', 'visual-studio-code'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
             print('RepMan:', colored(f"vscode installed -> v{getoutputof('code -v').readline().replace('\n','')}", 'green'))
+            
