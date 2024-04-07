@@ -105,7 +105,7 @@ class repman:
                 # get filepath of the project
                 for c in content:
                     c = c.replace('\n','')
-                    if c.split(':')[0] == projectname:
+                    if c.split(':')[0].lower() == projectname.lower():
                        path = c.split(':')[1]
                 
                 # change to the path
