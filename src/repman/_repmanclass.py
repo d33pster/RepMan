@@ -33,6 +33,8 @@ class repman:
         self.operatingsystem = platform.system()
         # projectlist
         self.projects: list[dict] = []
+        # default branch
+        self.default_branch: str = ''
     
     ################### SET PATH FROM OUTSIDE ###############################
     def setvariables(self):
@@ -57,6 +59,16 @@ class repman:
                 self.projects.append(data)
         except FileNotFoundError:
             pass
+        # -> get default branch
+        try:
+            with open(join(self.dotfolder, '.branch'), 'r') as b:
+                content = b.readlines()
+            for c in content:
+                c = c.replace('\n','')
+                if c.split(':')[0] == 'default':
+                    self.default_branch = c.split(':')[1]
+        except FileNotFoundError:
+            pass
     
     ############################ set remote ##############################
     def setremote(self, project:str, remote:str):
@@ -75,9 +87,9 @@ class repman:
         
         # identify remote
         link = False
-        if match(r'^https://github.com/\w+/\w+$', remote):
+        if match(r'^https://github.com/\w+/\w+', remote):
             link = True
-        elif match(r'^\w+/\w+$', remote):
+        elif match(r'^\w+/\w+', remote):
             link = False
         
         
@@ -102,6 +114,7 @@ class repman:
                 print('RepMan:', colored('Remote', 'blue'), 'is set ->', colored(f'{remote}', 'blue'))
             else:
                 print('RepMan:', colored('Remote', 'blue'), 'is set ->', colored(f'https://github.com/{remote}.git', 'blue'))
+        
     ####################### ADD LOCAL FUNCTION ######################### NEEDS FIXING ##################
     def addlocal(self, paths:list[str]):
         # ask for default branch if not set
@@ -250,8 +263,12 @@ class repman:
                     subprocess.Popen(['git', 'commit', '-m', f'{msgs[i]}'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
                     print('RepMan:', colored(f"Added {join(basename(path), files[i].replace('\n',''))}", 'green'))
                 
+                # get current branch
+                branch = getoutputof('git rev-parse --abbrev-ref HEAD').read().replace('\n','')
+                print('RepMan: Resolved current branch ->', colored(f'{branch}', 'blue'))
+                
                 print('RepMan:', colored('Pushing', 'yellow'), end='\r')
-                subprocess.Popen(['git', 'push'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                subprocess.Popen(['git', 'push', '-u', 'origin', f'{branch}'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
                 print('                                                      ', end='\r')
                 print('RepMan:', colored('Pushed', 'green'))
         except ConnectionError:
@@ -315,7 +332,7 @@ class repman:
         self.path = environ['REPMAN_PROJECT_PATH']
         chdir(self.path)
         # check format -> must be github link or <username>/<repo>
-        if match(r'^https://github.com/\w+/\w+$', url):
+        if match(r'^https://github.com/\w+/\w+', url):
             if match(r'^https://github.com/\w+/\w+.git$', url):
                 # remove extension and save
                 urlbasename = Path(url).stem
@@ -338,7 +355,7 @@ class repman:
         # -> check output
         index = len(logfile)-1
         # -> if error
-        if match(r'^fatal:\s+\w+$', logfile[index]):
+        if match(r'^fatal:\s+\w+', logfile[index]):
             print('RepMan:', colored(f'Cannot add \'{urlbasename}\'. Check for Spelling Errors.', 'red'))
             exit(1)
         
