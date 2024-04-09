@@ -277,6 +277,7 @@ class repman:
                 subprocess.Popen(['git', 'push', '-u', 'origin', f'{branch}'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
                 print('                                                      ', end='\r')
                 print('RepMan:', colored('Pushed', 'green'))
+                exit(0)
         except ConnectionError:
             print(colored('RepMan','red'), ': Please connect to the internet to use this feature.')
             exit(1)
