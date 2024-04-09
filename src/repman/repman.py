@@ -13,7 +13,6 @@ from optioner import options
 from sys import argv
 from re import match
 
-
 # list value removing function
 def rem(original:list[str], remove:list[str]) -> list[str]:
     removed:list[str] = []
@@ -27,7 +26,7 @@ def rem(original:list[str], remove:list[str]) -> list[str]:
 def main():
     try:
         # helptext
-        help = helptext(__version__)
+        helptex = helptext(__version__)
         # functions
         funk = funcdefs(__version__)
         # create arguments
@@ -82,33 +81,33 @@ def main():
                             otherarg = args[0]
                         
                         if otherarg=='-h' or otherarg=='--help':
-                            help.base()
+                            helptex.base()
                         elif otherarg=='-v' or otherarg=='--version':
-                            help.version_h(otherarg)
+                            helptex.version_h(otherarg)
                         elif otherarg=='-i' or otherarg=='--init':
-                            help.init_h(otherarg)
+                            helptex.init_h(otherarg)
                         elif otherarg=='-a' or otherarg=='--add':
-                            help.add_h(otherarg)
+                            helptex.add_h(otherarg)
                         elif otherarg=='-o' or otherarg=='--open':
-                            help.open_h(otherarg)
+                            helptex.open_h(otherarg)
                         elif otherarg == '-l' or otherarg == '--list':
-                            help.list_h(otherarg)
+                            helptex.list_h(otherarg)
                         elif otherarg == '-lp' or otherarg == '--list-w-path':
-                            help.listwpath_h(otherarg)
+                            helptex.listwpath_h(otherarg)
                         elif otherarg == '-ae' or otherarg == '--add-existing':
-                            help.addexisting_h(otherarg)
+                            helptex.addexisting_h(otherarg)
                         elif otherarg == '-al' or otherarg == '--add-local':
-                            help.addlocal_h(otherarg)
+                            helptex.addlocal_h(otherarg)
                         elif otherarg == '-u' or otherarg == '--update':
-                            help.update_h(otherarg)
+                            helptex.update_h(otherarg)
                         elif otherarg == '-sr' or otherarg == '--set-remote':
-                            help.setremote_h(otherarg)
+                            helptex.setremote_h(otherarg)
                         elif otherarg == '-cred' or otherarg == '--credits':
-                            help.credits()
+                            helptex.credits()
                         else:
                             print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                     elif len(args)<2:
-                        help.base()
+                        helptex.base()
                     elif len(args)>2:
                         print(colored('RepMan Err', 'red'), ': Please use one argument at a time to show help on that argument.')
                         print(colored('Format', 'blue'), ': \'repman <argument> -h\' or \'repman <argument> --help\'.')
@@ -130,33 +129,33 @@ def main():
                             otherarg = args[0]
                         
                         if otherarg=='-h' or otherarg=='--help':
-                            help.base()
+                            helptex.base()
                         elif otherarg=='-v' or otherarg=='--version':
-                            help.version_h(otherarg)
+                            helptex.version_h(otherarg)
                         elif otherarg=='-i' or otherarg=='--init':
-                            help.init_h(otherarg)
+                            helptex.init_h(otherarg)
                         elif otherarg=='-a' or otherarg=='--add':
-                            help.add_h(otherarg)
+                            helptex.add_h(otherarg)
                         elif otherarg=='-o' or otherarg=='--open':
-                            help.open_h(otherarg)
+                            helptex.open_h(otherarg)
                         elif otherarg == '-l' or otherarg == '--list':
-                            help.list_h(otherarg)
+                            helptex.list_h(otherarg)
                         elif otherarg == '-lp' or otherarg == '--list-w-path':
-                            help.listwpath_h(otherarg)
+                            helptex.listwpath_h(otherarg)
                         elif otherarg == '-ae' or otherarg == '--add-existing':
-                            help.addexisting_h(otherarg)
+                            helptex.addexisting_h(otherarg)
                         elif otherarg == '-al' or otherarg == '--add-local':
-                            help.addlocal_h(otherarg)
+                            helptex.addlocal_h(otherarg)
                         elif otherarg == '-u' or otherarg == '--update':
-                            help.update_h(otherarg)
+                            helptex.update_h(otherarg)
                         elif otherarg == '-sr' or otherarg == '--set-remote':
-                            help.setremote_h(otherarg)
+                            helptex.setremote_h(otherarg)
                         elif otherarg == '-cred' or otherarg == '--credits':
-                            help.credits()
+                            helptex.credits()
                         else:
                             print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                     elif len(args)<2:
-                        help.base()
+                        helptex.base()
                     elif len(args)>2:
                         print(colored('RepMan Err', 'red'), ': Please use one argument at a time to show help on that argument.')
                         print(colored('Format', 'blue'), ': \'repman <argument> -h\' or \'repman <argument> --help\'.')
@@ -165,16 +164,14 @@ def main():
                         print(colored('RepMan Err', 'red'), ': Could not resolve arguments.')
                         print(colored('RepMan Hint', 'blue'), ': Run \'repman -h\' or \'repman --help\'.')
                         exit(1)
-                else:
-                    pass
                 
                 # version
                 if '-v' in args or '--version' in args:
-                    help.version()
+                    helptex.version_s()
                 
                 # credits
                 if '-cred' in args or '--credits' in args:
-                    help.credits()
+                    helptex.credits()
                 
                 # init
                 if '-i' in args:
