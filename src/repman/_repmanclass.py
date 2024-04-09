@@ -242,6 +242,12 @@ class repman:
                 except UnboundLocalError:
                     print(colored('RepMan', 'red'), f": no project named {projectname}.")
                     exit(1)
+                    
+                # run git pull for safety
+                print('RepMan:', colored('Pulling', 'yellow'), end='\r')
+                subprocess.Popen(['git', 'pull'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                print('                                       ', end='\r')
+                print('RepMan:', colored('Pulled.', 'blue'))
                 # get files that are changed.
                 files = getoutputof('git diff --name-only').readlines()
                 files2 = getoutputof('git ls-files --others --exclude-standard').readlines()
@@ -317,6 +323,7 @@ class repman:
                 with open(join(self.dotfolder, '.projects'), 'a') as projfile:
                     projfile.write(basename(path)+':'+path+'\n')
                 print('RepMan:', colored(f'Added {basename(path)} -> {path}', 'green'))
+                newpath = path
             else:
                 ## copy
                 try:
@@ -325,6 +332,11 @@ class repman:
                     print(colored('RepMan', 'red'), f': No such file in this directory. <- {path}')
                     exit(1)
                 print('RepMan:', colored(f'Added {basename(path)} -> {newpath}', 'green'))
+            
+            chdir(newpath)
+            # change git rule
+            subprocess.Popen(['git', 'config', 'pull.rebase', 'true'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+            print('RepMan:', colored('Changed git pull rebase to true.', 'blue'))
     
     ############## ADD FUNCTION INSIDE REPMAN CLASS #############################
     def add(self, url:str):
