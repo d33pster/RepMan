@@ -4,7 +4,7 @@
 # Linux -> aarch64
 # MacOs -> AppleSilicon(arm64)
 
-__version__ = '1.0.3'
+__version__ = '1.0.4'
 
 from repman._repmanfunctions import funcdefs
 from repman._repmanhelps import helptext
@@ -316,6 +316,8 @@ def main():
                     except IndexError:
                         print(colored('RepMan', 'red'), ': \'-al\' needs atleast one value.')
                         exit(1)
+                    
+                    funk.addlocal(value)
                 elif '--add-local' in args:
                     index = argv.index('--add-local')
                     value:list[str] = []
@@ -326,7 +328,7 @@ def main():
                         print(colored('RepMan', 'red'), ': \'--add-local\' needs atleast one value.')
                         exit(1)
                     
-                funk.addlocal(value)
+                    funk.addlocal(value)
                 
                 # set remote
                 if '-sr' in args:
@@ -350,6 +352,28 @@ def main():
                         funk.setremote(project, remote)
                     else:
                         print(colored('RepMan', 'red')+': \'-sr\' accepts only two values')
+                        exit(1)
+                elif '--set-remote' in args:
+                    index = argv.index('--set-remote')
+                    value:list[str] = []
+                    try:
+                        for i in range(index+1, len(argv)):
+                            value.append(argv[i])
+                    except IndexError:
+                        print(colored('RepMan', 'red')+': \'--set-remote\' needs two values. <project> and <remote>')
+                        exit(1)
+                    
+                    project:str = ''
+                    remote:str = ''
+                    if len(value)==2:
+                        for v in value:
+                            if match(r'^https://github.com/\w+/\w+', v) or match(r'^\w+/\w+', v):
+                                remote = v
+                            else:
+                                project = v
+                        funk.setremote(project, remote)
+                    else:
+                        print(colored('RepMan', 'red')+': \'--set-remote\' accepts only two values')
                         exit(1)
                     
     except KeyboardInterrupt:
