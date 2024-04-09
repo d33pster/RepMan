@@ -145,12 +145,14 @@ class repman:
 
     ############## OPEN FUNCTION INSIDE REPMAN CLASS #############################
     def open(self, projects:list[str]):
+        count = 0
         with open(join(self.dotfolder, '.projects'), 'r') as t:
             projfile = t.readlines()
         for project in projects:
             for proj in projfile:
                 proj = proj.replace('\n','')
-                if project == proj.split(':')[0]:
+                if project.lower() == proj.split(':')[0].lower():
+                    count += 1
                     # check the project for templates and stuff -> add later
                     # open the project.
                     chdir(proj.split(':')[1])
@@ -158,6 +160,11 @@ class repman:
                     # print it out
                     print('RepMan:', colored(f'Opened {project}', 'green'), 'from', colored(f"{proj.split(':')[1]}", 'blue'))
                     chdir(self.workingpath)
+        
+            if count == 0:
+                print(colored('RepMan', 'red')+f": No project name \'{project}\' under my care.")
+            
+            count = 0
     
     ############## LISTER FUNCTION INSIDE REPMAN CLASS #############################
     def lister(self, path:bool=False):
