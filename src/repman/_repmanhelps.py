@@ -19,7 +19,7 @@ class helptext:
         exit(0)
     
     # function to display version and exit
-    def version(self):
+    def version_s(self):
         print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
         print('         version', colored(f'v{self.version}', 'red'))
         print('         author:', colored('d33pster', 'light_blue'))
