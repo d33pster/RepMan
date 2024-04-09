@@ -8,9 +8,11 @@ __version__ = '1.0.1'
 
 from repman._repmanfunctions import funcdefs
 from repman._repmanhelps import helptext
+from termcolor import colored
 from optioner import options
 from sys import argv
-from termcolor import colored
+from re import match
+
 
 # list value removing function
 def rem(original:list[str], remove:list[str]) -> list[str]:
@@ -29,8 +31,8 @@ def main():
         # functions
         funk = funcdefs(__version__)
         # create arguments
-        shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp', 'ae', 'al', 'u']
-        longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path', 'add-existing', 'add-local', 'update']
+        shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp', 'ae', 'al', 'u', 'sr']
+        longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path', 'add-existing', 'add-local', 'update', 'set-remote']
         
         # All args
         original = shortargs.copy()
@@ -46,7 +48,8 @@ def main():
             ['lp', 'list-w-path'],rem(original, ['lp', 'list-w-path', 'h', 'help']),
             ['ae', 'add-existing'],rem(original, ['ae', 'add-existing', 'h', 'help']),
             ['al', 'add-local'], rem(original, ['al', 'add-local', 'h', 'help']),
-            ['u', 'update'], rem(original, ['u', 'update', 'h', 'help'])
+            ['u', 'update'], rem(original, ['u', 'update', 'h', 'help']),
+            ['sr', 'set-remote'], rem(original, ['sr', 'set-remote', 'h', 'help'])
         ]
         
         optctrl = options(shortargs, longargs, argv[1:], ifthisthennotthat=mutex)
@@ -97,6 +100,8 @@ def main():
                             help.addlocal_h(otherarg)
                         elif otherarg == '-u' or otherarg == '--update':
                             help.update_h(otherarg)
+                        elif otherarg == '-sr' or otherarg == '--set-remote':
+                            help.setremote_h(otherarg)
                         else:
                             print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                     elif len(args)<2:
@@ -141,6 +146,8 @@ def main():
                             help.addlocal_h(otherarg)
                         elif otherarg == '-u' or otherarg == '--update':
                             help.update_h(otherarg)
+                        elif otherarg == '-sr' or otherarg == '--set-remote':
+                            help.setremote_h(otherarg)
                         else:
                             print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                     elif len(args)<2:
@@ -300,8 +307,6 @@ def main():
                     except IndexError:
                         print(colored('RepMan', 'red'), ': \'-al\' needs atleast one value.')
                         exit(1)
-                    
-                    funk.addlocal(value)
                 elif '--add-local' in args:
                     index = argv.index('--add-local')
                     value:list[str] = []
@@ -312,7 +317,32 @@ def main():
                         print(colored('RepMan', 'red'), ': \'--add-local\' needs atleast one value.')
                         exit(1)
                     
-                    funk.addlocal(value)
+                funk.addlocal(value)
+                
+                # set remote
+                if '-sr' in args:
+                    index = argv.index('-sr')
+                    value:list[str] = []
+                    try:
+                        for i in range(index+1, len(argv)):
+                            value.append(argv[i])
+                    except IndexError:
+                        print(colored('RepMan', 'red')+': \'-sr\' needs two values. <project> and <remote>')
+                        exit(1)
+                    
+                    project:str = ''
+                    remote:str = ''
+                    if len(value)==2:
+                        for v in value:
+                            if match(r'^https://github.com/\w+/\w+', v) or match(r'^\w+/\w+', v):
+                                remote = v
+                            else:
+                                project = v
+                        funk.setremote(project, remote)
+                    else:
+                        print(colored('RepMan', 'red')+': \'-sr\' accepts only two values')
+                        exit(1)
+                    
     except KeyboardInterrupt:
         print('\n'+colored('RepMan', 'red')+": Decide Karen!")
                 
