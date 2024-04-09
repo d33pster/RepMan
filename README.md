@@ -1,3 +1,9 @@
+![PyPI - Version](https://img.shields.io/pypi/v/RepMan?style=flat&label=pypi%20version&labelColor=magenta&color=green)
+![PyPI - Wheel](https://img.shields.io/pypi/wheel/RepMan)
+![GitHub License](https://img.shields.io/github/license/d33pster/RepMan)
+![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fd33pster%2FRepMan%2Fmain%2Fpyproject.toml)
+
+
 # Overview
 
 RepMan or Repository Manager is written on python to serve as GitHub Repo Manager for the end users.
@@ -112,6 +118,10 @@ repman <option> -h
 
 repman <option> --help
 ```
+
+## Usage screenshots
+
+<img src='images/update.png'>
 
 ## Supported OS and architectures and notes
 - MacOS (Apple Silicon Chip - M series) (Arch - arm64) (Requires Homebrew)
