@@ -3,6 +3,7 @@
 ![GitHub License](https://img.shields.io/github/license/d33pster/RepMan)
 ![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fd33pster%2FRepMan%2Fmain%2Fpyproject.toml)
 [![Build status](https://ci.appveyor.com/api/projects/status/bbptf69j4n86fthj?svg=true)](https://ci.appveyor.com/project/d33pster/repman)
+![Libraries.io dependency status for latest release](https://img.shields.io/librariesio/release/pypi/RepMan)
 
 # Overview
 
