@@ -58,6 +58,50 @@ class repman:
         except FileNotFoundError:
             pass
     
+    ############################ set remote ##############################
+    def setremote(self, project:str, remote:str):
+        # get project path.
+        path = None
+        for d in self.projects:
+            if d['project'].lower() == project.lower():
+                path = d['path']
+        
+        if path==None:
+            print(colored('RepMan', 'red')+f": No project named {project}.")
+            exit(1)
+        
+        # change dir
+        chdir(path)
+        
+        # identify remote
+        link = False
+        if match(r'^https://github.com/\w+/\w+$', remote):
+            link = True
+        elif match(r'^\w+/\w+$', remote):
+            link = False
+        
+        
+        with open(join(self.dotfolder, '.log'), 'w') as logfile:
+            if link:
+                subprocess.Popen(['git','remote', 'add', 'origin', f'{remote}'], stderr=logfile, stdout=logfile).wait()
+            else:
+                subprocess.Popen(['git','remote', 'add', 'origin', f'https://github.com/{remote}.git'], stderr=logfile, stdout=logfile).wait()
+        
+        with open(join(self.dotfolder, '.log'), 'r') as l:
+            logfile = l.readlines()
+        
+        if len(logfile)!=0:
+            print('RepMan:', colored('Remote is already set.', 'red'), end='')
+            if link:
+                subprocess.Popen(['git', 'remote', 'set-url', 'origin', f'{remote}']).wait()
+            else:
+                subprocess.Popen(['git', 'remote', 'set-url', 'origin', f'https://github.com/{remote}.git']).wait()
+            print(colored('Overwritten.', 'blue'))
+        else:
+            if link:
+                print('RepMan:', colored('Remote', 'blue'), 'is set ->', colored(f'{remote}', 'blue'))
+            else:
+                print('RepMan:', colored('Remote', 'blue'), 'is set ->', colored(f'https://github.com/{remote}.git', 'blue'))
     ####################### ADD LOCAL FUNCTION ######################### NEEDS FIXING ##################
     def addlocal(self, paths:list[str]):
         # ask for default branch if not set
@@ -68,9 +112,13 @@ class repman:
             for c in content:
                 c = c.replace('\n','')
                 if c.split(':')[0] == 'default':
-                    branch = c.split(':')[1]
+                    branch = c.split(':')[1].replace('\n','').strip()
         else:
-            branch = input('RepMan -> Enter '+colored('default branch', 'blue')+colored('(one-time)'+'dark_grey') + ': ')
+            branch = input('RepMan -> Enter '+colored('default branch', 'blue')+colored('(one-time)','dark_grey') + ': ').strip()
+            if branch=='\n' or branch=='':
+                print('RepMan:', colored('Defaulting to main.', 'light_blue'))
+                branch = 'main'
+            
             with open(join(self.dotfolder, '.branch'), 'w') as bfile:
                 bfile.write('default:'+branch+"\n")
         
@@ -79,34 +127,101 @@ class repman:
             path = abspath(path)
             # -> check if already inside the directory
             if dirname(path) == self.path:
+                # check existence of the folder.
+                if not there(path):
+                    print(colored('RepMan', 'red'), f': No such file or directory. <- {path}')
+                    exit(1)
                 # add entry in the .projects file
                 with open(join(self.dotfolder, '.projects'), 'a') as projfile:
                     projfile.write(basename(path)+':'+path+'\n')
                 print('RepMan:', colored(f'Added {basename(path)} -> {path}', 'green'))
-                # change to the path and change git branch
+                newpath = path
             else:
                 ## copy
                 try:
                     newpath = copytree(path, join(self.path, basename(path)))
                 except FileNotFoundError:
-                    print(colored('RepMan', 'red'), f': No such file in this directory. <- {path}')
+                    print(colored('RepMan', 'red'), f': No such file or directory. <- {path}')
                     exit(1)
+                
+                ## add it in the projfile.
+                with open(join(self.dotfolder, '.projects'), 'a') as projfile:
+                    projfile.write(basename(newpath)+":"+newpath+"\n")
+                
                 print('RepMan:', colored(f'Added {basename(path)} -> {newpath}', 'green'))
+            
+            #change dir to newdir
+            chdir(newpath)
+            # check for git folder
+            if there(join(newpath, '.git')):
+                print('RepMan:', colored(f'{basename(newpath)} is already a git repository.', 'green'))
+            else:
+                print('RepMan:', colored(f'{basename(newpath)} is not a git repository.', 'red'))
+                subprocess.Popen(['git', 'init'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                print('RepMan:', colored(f'{basename(newpath)} has been initialized as a git repository.', 'blue'))
+            
+            
+            # set branch to default branch
+            subprocess.Popen(['git', 'branch', '-M', f'{branch}'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+            print('RepMan:', colored(f'Branch is set to \'{branch}\' by default.', 'yellow'), 'To change this, change default branch. For more info run \'-h\'.')
+            
+            # check the files that were to be added.
+            files = getoutputof('git diff --name-only').readlines()
+            files2 = getoutputof('git ls-files --others --exclude-standard').readlines()
+            msgs = []
+            for file in files:
+                file = file.replace('\n','')
+                commitmsg = input('RepMan -> Enter commit msg for ' + colored(f'{join(basename(path), file)}', 'blue') + ': ')
+                msgs.append(commitmsg)
+            
+            for file in files2:
+                file = file.replace('\n','')
+                commitmsg = input('RepMan -> Enter commit msg for ' + colored(f'{join(basename(path), file)}', 'blue') + colored('(new)', 'dark_grey') + ': ')
+                msgs.append(commitmsg)
+            
+            files.extend(files2)
+            
+            # commit the changes
+            for i in range(len(files)):
+                subprocess.Popen(['git', 'add', f"{files[i].replace('\n','')}"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                subprocess.Popen(['git', 'commit', '-m', f'{msgs[i]}'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                print('RepMan:', colored(f"Added {join(basename(path), files[i].replace('\n',''))}", 'green'))
+            
+            remote = input('RepMan -> Enter ' + colored('remote', 'blue') + f' for {basename(newpath)}' + colored('one-time', 'dark_grey') + ': ').strip()
+            # exit if remote not provided.
+            if remote=='' or remote==' ' or remote=='\n':
+                print('RepMan:', colored('Skipping remote. Add later using \'repman -sr <reponame> <remote>\'. For more help, run \'repman -sr -h\''))
+                exit(0)
+            else:
+                # else remote is given.
+                # -> check for the pattern "github.com/..."
+                if match(r'^https://github.com/\w+/\w+', remote):
+                    # add origin
+                    subprocess.Popen(['git','remote','add','origin',f'{remote}'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                    print('RepMan:', colored('Added Remote', 'dark_grey'), '->', colored(f'{remote}', 'blue'))
+                elif match(r'^\w+/\w+', remote):
+                    # <username>/<repo>
+                    # add origin
+                    subprocess.Popen(['git','remote','add','origin',f'https://github.com/{remote}.git'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                    print('RepMan:', colored('Added Remote', 'dark_grey'), '->', colored(f'https://github.com/{remote}.git', 'blue'))
+                
+                # git push
+                print('RepMan:', colored('Pushing', 'yellow'), end='\r')
+                subprocess.Popen(['git', 'push', '-u', 'origin', f'{branch}'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                print('                                                      ', end='\r')
+                print('RepMan:', colored('Pushed.', 'green'))
+                exit(0)
     
     ###################### UPDATE FUNCTION #######################################
     def update(self, projectname:str):
         try:
             code = requests.get('https://google.com/').status_code
             if code == 200:
-                # get data from saved file
-                with open(join(self.dotfolder, '.projects'), 'r') as p:
-                    content = p.readlines()
                 
                 # get filepath of the project
-                for c in content:
-                    c = c.replace('\n','')
-                    if c.split(':')[0].lower() == projectname.lower():
-                       path = c.split(':')[1]
+                for d in self.projects:
+                    if d['project'].lower() == projectname.lower():
+                        path = d['path']
                 
                 # change to the path
                 try:
@@ -146,19 +261,17 @@ class repman:
     ############## OPEN FUNCTION INSIDE REPMAN CLASS #############################
     def open(self, projects:list[str]):
         count = 0
-        with open(join(self.dotfolder, '.projects'), 'r') as t:
-            projfile = t.readlines()
         for project in projects:
-            for proj in projfile:
-                proj = proj.replace('\n','')
-                if project.lower() == proj.split(':')[0].lower():
+            for d in self.projects:
+                if d['project'].lower() == project.lower():
+                    path = d['path']
                     count += 1
                     # check the project for templates and stuff -> add later
                     # open the project.
-                    chdir(proj.split(':')[1])
+                    chdir(path)
                     subprocess.Popen(['code', '.'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
                     # print it out
-                    print('RepMan:', colored(f'Opened {project}', 'green'), 'from', colored(f"{proj.split(':')[1]}", 'blue'))
+                    print('RepMan:', colored(f'Opened {project}', 'green'), 'from', colored(f"{path}", 'blue'))
                     chdir(self.workingpath)
         
             if count == 0:
