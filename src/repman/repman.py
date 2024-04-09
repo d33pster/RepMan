@@ -4,7 +4,7 @@
 # Linux -> aarch64
 # MacOs -> AppleSilicon(arm64)
 
-__version__ = '1.0.1'
+__version__ = '1.0.3'
 
 from repman._repmanfunctions import funcdefs
 from repman._repmanhelps import helptext
@@ -31,8 +31,8 @@ def main():
         # functions
         funk = funcdefs(__version__)
         # create arguments
-        shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp', 'ae', 'al', 'u', 'sr']
-        longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path', 'add-existing', 'add-local', 'update', 'set-remote']
+        shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp', 'ae', 'al', 'u', 'sr', 'cred']
+        longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path', 'add-existing', 'add-local', 'update', 'set-remote', 'credits']
         
         # All args
         original = shortargs.copy()
@@ -49,7 +49,8 @@ def main():
             ['ae', 'add-existing'],rem(original, ['ae', 'add-existing', 'h', 'help']),
             ['al', 'add-local'], rem(original, ['al', 'add-local', 'h', 'help']),
             ['u', 'update'], rem(original, ['u', 'update', 'h', 'help']),
-            ['sr', 'set-remote'], rem(original, ['sr', 'set-remote', 'h', 'help'])
+            ['sr', 'set-remote'], rem(original, ['sr', 'set-remote', 'h', 'help']),
+            ['cred', 'credits'], rem(original, ['cred', 'credits', 'h', 'help'])
         ]
         
         optctrl = options(shortargs, longargs, argv[1:], ifthisthennotthat=mutex)
@@ -102,6 +103,8 @@ def main():
                             help.update_h(otherarg)
                         elif otherarg == '-sr' or otherarg == '--set-remote':
                             help.setremote_h(otherarg)
+                        elif otherarg == '-cred' or otherarg == '--credits':
+                            help.credits()
                         else:
                             print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                     elif len(args)<2:
@@ -148,6 +151,8 @@ def main():
                             help.update_h(otherarg)
                         elif otherarg == '-sr' or otherarg == '--set-remote':
                             help.setremote_h(otherarg)
+                        elif otherarg == '-cred' or otherarg == '--credits':
+                            help.credits()
                         else:
                             print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                     elif len(args)<2:
@@ -166,6 +171,10 @@ def main():
                 # version
                 if '-v' in args or '--version' in args:
                     help.version()
+                
+                # credits
+                if '-cred' in args or '--credits' in args:
+                    help.credits()
                 
                 # init
                 if '-i' in args:
