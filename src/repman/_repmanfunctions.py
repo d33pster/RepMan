@@ -46,3 +46,7 @@ class funcdefs:
     def addlocal(self, paths: list[str]):
         self.repman.setvariables()
         self.repman.addlocal(paths)
+    
+    def setremote(self, project:str, remote:str):
+        self.repman.setvariables()
+        self.repman.setremote(project, remote)
