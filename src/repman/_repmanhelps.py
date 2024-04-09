@@ -8,6 +8,16 @@ class helptext:
     def __init__(self, version:str):
         self.version = version
     
+    # function to show credits
+    def credits(self):
+        print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
+        print(colored('credits\n', 'red'))
+        print('  |  Author: Soumyo Deep Gupta (@d33pster)  |')
+        print('  |  Email: deep.main.ac@gmail.com          |')
+        print('  |  copyright @d33pster                    |')
+        print('\nEND')
+        exit(0)
+    
     # function to display version and exit
     def version(self):
         print(colored('RepMan', 'blue'), ': Repository Manager (alias: Project Manager)')
