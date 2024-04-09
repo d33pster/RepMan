@@ -6,7 +6,6 @@ from termcolor import colored
 from os import getcwd as pwd, popen as getoutputof, system as run, chdir, listdir, environ, makedirs
 from os.path import expanduser, join, basename, exists as there, dirname, abspath
 from pathlib import Path
-from tkinter import filedialog
 from re import search, match
 import pandas as pd
 from tabulate import tabulate
@@ -447,7 +446,11 @@ class repman:
             if self.path == '':
                 print(colored(' Choose a Project folder...', 'blue'), end='\r')
                 # -> get filepath
-                self.path = filedialog.askdirectory(initialdir=self.workingpath, title='select project path')
+                try:
+                    from tkinter import filedialog
+                    self.path = filedialog.askdirectory(initialdir=self.workingpath, title='select project path')
+                except ModuleNotFoundError:
+                    self.path = input('Enter Project path: ')
             else:
                 pass
                 
