@@ -4,7 +4,7 @@
 # Linux -> aarch64
 # MacOs -> AppleSilicon(arm64)
 
-__version__ = '1.0.4'
+__version__ = '1.0.5'
 
 from repman._repmanfunctions import funcdefs
 from repman._repmanhelps import helptext
