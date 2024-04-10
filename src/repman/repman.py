@@ -30,8 +30,8 @@ def main():
         # functions
         funk = funcdefs(__version__)
         # create arguments
-        shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp', 'ae', 'al', 'u', 'sr', 'cred']
-        longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path', 'add-existing', 'add-local', 'update', 'set-remote', 'credits']
+        shortargs = ['h', 'v', 'a', 'i', 'o', 'l', 'lp', 'ae', 'al', 'u', 'sr', 'cred', 'cb']
+        longargs = ['help', 'version', 'add', 'init', 'open', 'list', 'list-w-path', 'add-existing', 'add-local', 'update', 'set-remote', 'credits', 'create-branch']
         
         # All args
         original = shortargs.copy()
@@ -49,7 +49,8 @@ def main():
             ['al', 'add-local'], rem(original, ['al', 'add-local', 'h', 'help']),
             ['u', 'update'], rem(original, ['u', 'update', 'h', 'help']),
             ['sr', 'set-remote'], rem(original, ['sr', 'set-remote', 'h', 'help']),
-            ['cred', 'credits'], rem(original, ['cred', 'credits', 'h', 'help'])
+            ['cred', 'credits'], rem(original, ['cred', 'credits', 'h', 'help']),
+            ['cb', 'create-branch'], rem(original, ['cb', 'create-branch', 'h', 'help'])
         ]
         
         optctrl = options(shortargs, longargs, argv[1:], ifthisthennotthat=mutex)
@@ -104,6 +105,8 @@ def main():
                             helptex.setremote_h(otherarg)
                         elif otherarg == '-cred' or otherarg == '--credits':
                             helptex.credits()
+                        elif otherarg == '-cb' or otherarg == '--create-branch':
+                            helptex.cnew_h(otherarg)
                         else:
                             print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                     elif len(args)<2:
@@ -152,6 +155,8 @@ def main():
                             helptex.setremote_h(otherarg)
                         elif otherarg == '-cred' or otherarg == '--credits':
                             helptex.credits()
+                        elif otherarg == '-cb' or otherarg == '--create-branch':
+                            helptex.cnew_h(otherarg)
                         else:
                             print(colored('RepMan Err', 'red'), f': argument \'{otherarg}\' is not recognised.')
                     elif len(args)<2:
@@ -372,7 +377,37 @@ def main():
                     else:
                         print(colored('RepMan', 'red')+': \'--set-remote\' accepts only two values')
                         exit(1)
+                
+                # cnew
+                if '-cb' in args:
+                    index = argv.index('-cb')
+                    value:list[str] = []
+                    try:
+                        for i in range(index+1, len(argv)):
+                            value.append(argv[i])
+                    except IndexError:
+                        print(colored('RepMan', 'red')+': \'-cb\' accepts only two values.')
+                        exit(1)
                     
+                    bname = value[0]
+                    pname = value[1]
+                    
+                    funk.cnew(bname, pname)
+                elif '--create-branch' in args:
+                    index = argv.index('--create-branch')
+                    value:list[str] = []
+                    try:
+                        for i in range(index+1, len(argv)):
+                            value.append(argv[i])
+                    except IndexError:
+                        print(colored('RepMan', 'red')+': \'--create-branch\' accepts only two values.')
+                        exit(1)
+                    
+                    bname = value[0]
+                    pname = value[1]
+                    
+                    funk.cnew(bname, pname)
+                
     except KeyboardInterrupt:
         print('\n'+colored('RepMan', 'red')+": Decide Karen!")
                 
