@@ -113,6 +113,26 @@ class repman:
                 print('RepMan:', colored('Remote', 'blue'), 'is set ->', colored(f'{remote}', 'blue'))
             else:
                 print('RepMan:', colored('Remote', 'blue'), 'is set ->', colored(f'https://github.com/{remote}.git', 'blue'))
+    
+    ################################# checkout and commit #########################################
+    def checknew(self, branchname: str, projectname:str):
+        path = None
+        for d in self.projects:
+            if d['project'].lower() == projectname.lower():
+                path = d['path']
+        
+        if path==None:
+            print(colored('RepMan', 'red')+f": No project named {projectname} under my care.")
+            exit(1)
+        
+        chdir(path)
+        
+        # create branch
+        subprocess.Popen(['git', 'checkout', '-b', f'{branchname}'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+        
+        # resolve it to check success
+        bname = getoutputof('git rev-parse --abbrev-ref HEAD').read().replace('\n','')
+        print('RepMan: Created new branch', colored(f'{bname}', 'blue')+'.')
         
     ####################### ADD LOCAL FUNCTION ######################### NEEDS FIXING ##################
     def addlocal(self, paths:list[str]):
