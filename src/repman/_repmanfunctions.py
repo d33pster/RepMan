@@ -50,3 +50,7 @@ class funcdefs:
     def setremote(self, project:str, remote:str):
         self.repman.setvariables()
         self.repman.setremote(project, remote)
+    
+    def cnew(self, bname: str, pname: str):
+        self.repman.setvariables()
+        self.repman.checknew(bname, pname)
