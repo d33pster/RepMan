@@ -215,7 +215,8 @@ class repman:
             
             # commit the changes
             for i in range(len(files)):
-                subprocess.Popen(['git', 'add', f"{files[i].replace('\n','')}"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
+                f = files[i].replace('\n','')
+                subprocess.Popen(['git', 'add', f"{f}"], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
                 subprocess.Popen(['git', 'commit', '-m', f'{msgs[i]}'], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL).wait()
                 print('RepMan:', colored(f"Added {join(basename(path), files[i].replace('\n',''))}", 'green'))
             
